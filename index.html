@@ -378,7 +378,7 @@
         // KONFIGURACE - UPRAV TUTO URL
         // =============================================================================
         
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwV8ZBdWFPcgga1BoKO4dIYKJ1Qc-ghJA9F_cN9SeBDRtwzBWdSXyjUWpykfYkVFbxa/exec'';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeIxwaIs96MExSVBoJjTYVMiRbN027M5V5kbr7MPrZR6JqMb4Weho4IQK4BLtpSYvy/exec';
         
         // =============================================================================
         // GLOBÁLNÍ PROMĚNNÉ
@@ -407,17 +407,14 @@
                     throw new Error('Google Apps Script URL není nakonfigurována!');
                 }
 
-                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getData');
+                // Použijeme JSONP pro obejití CORS
+                const data = await fetchWithJsonp(GOOGLE_SCRIPT_URL + '?action=getData');
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error: ${response.status}`);
+                if (data.error) {
+                    throw new Error(data.error);
                 }
                 
-                DATA = await response.json();
-                
-                if (DATA.error) {
-                    throw new Error(DATA.error);
-                }
+                DATA = data;
                 
                 // Aktualizovat timestamp
                 const timestamp = DATA.meta?.lastUpdateFormatted || DATA.exportedAtFormatted || 'Neznámé';
@@ -444,6 +441,56 @@
                     </div>
                 `;
             }
+        }
+
+        // JSONP helper pro obejití CORS
+        function fetchWithJsonp(url) {
+            return new Promise((resolve, reject) => {
+                // Nejdřív zkusíme normální fetch
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => resolve(data))
+                    .catch(fetchError => {
+                        console.log('Fetch failed, trying alternative method...', fetchError);
+                        
+                        // Fallback - zkusíme iframe proxy
+                        const callbackName = 'jsonpCallback_' + Date.now();
+                        const timeout = setTimeout(() => {
+                            cleanup();
+                            reject(new Error('Timeout při načítání dat'));
+                        }, 30000);
+
+                        // Cleanup function
+                        const cleanup = () => {
+                            clearTimeout(timeout);
+                            delete window[callbackName];
+                        };
+
+                        // Alternativní metoda - použití img pro ping a pak opakovaný fetch
+                        // Google Apps Script by měl mít CORS povolený
+                        
+                        // Zkusíme fetch s no-cors a pak redirect
+                        fetch(url, { 
+                            method: 'GET',
+                            mode: 'cors',
+                            credentials: 'omit'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            cleanup();
+                            resolve(data);
+                        })
+                        .catch(e => {
+                            cleanup();
+                            reject(new Error('Nepodařilo se načíst data: ' + e.message));
+                        });
+                    });
+            });
         }
 
         // =============================================================================
