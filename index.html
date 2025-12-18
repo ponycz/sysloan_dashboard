@@ -1189,7 +1189,12 @@
             `;
 
             // 1. Rating – počet úvěrů
-            const ratingStatsSorted = ratingStats.sort((a, b) => a.Rating.localeCompare(b.Rating));
+            const ratingOrder = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'N/A'];
+            const ratingStatsSorted = ratingStats.sort((a, b) => {
+                const idxA = ratingOrder.indexOf(a.Rating);
+                const idxB = ratingOrder.indexOf(b.Rating);
+                return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+            });
             const ratingColors = ratingStatsSorted.map(r => r.Rating.startsWith('A') ? 'rgba(16, 185, 129, 0.8)' : r.Rating.startsWith('B') ? 'rgba(59, 130, 246, 0.8)' : 'rgba(245, 158, 11, 0.8)');
 
             overviewCharts.ratingCount = new Chart(document.getElementById('ratingCountChart'), {
