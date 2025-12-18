@@ -719,16 +719,16 @@
             }
             
             // Úvěry s pohledávkou > 0
-            const withPohledavka = loans.filter(l => l.pohledavka && l.pohledavka > 0);
+            const withPohledavka = loans.filter(l => l.pohledavky && l.pohledavky > 0);
             if (withPohledavka.length > 0) {
                 insights.push({
                     type: 'warning',
                     title: '⚠️ Úvěry s pohledávkou > 0',
                     count: withPohledavka.length,
-                    value: withPohledavka.reduce((sum, l) => sum + (l.pohledavka || 0), 0),
-                    items: withPohledavka.sort((a, b) => (b.pohledavka || 0) - (a.pohledavka || 0)).slice(0, 20).map(l => ({
+                    value: withPohledavka.reduce((sum, l) => sum + (l.pohledavky || 0), 0),
+                    items: withPohledavka.sort((a, b) => (b.pohledavky || 0) - (a.pohledavky || 0)).slice(0, 20).map(l => ({
                         name: l.jmeno,
-                        pohledavka: l.pohledavka,
+                        pohledavka: l.pohledavky,
                         value: l.vyse_uveru,
                         stav_splaceni: l.stav_splaceni
                     }))
@@ -877,8 +877,7 @@
                 { range: '10-20 mil.', min: 10000000, max: 20000000 },
                 { range: '20-50 mil.', min: 20000000, max: 50000000 },
                 { range: '50-100 mil.', min: 50000000, max: 100000000 },
-                { range: '100-200 mil.', min: 100000000, max: 200000000 },
-                { range: '200+ mil.', min: 200000000, max: Infinity }
+                { range: '100+ mil.', min: 100000000, max: Infinity }
             ];
             
             return ranges.map(r => {
