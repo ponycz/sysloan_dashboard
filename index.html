@@ -455,8 +455,12 @@
                 const ltvUveru = loan.ltv_uveru ? loan.ltv_uveru * 100 : null;
                 const ltvTranse = loan.ltv_transe ? loan.ltv_transe * 100 : null;
                 
+                // Oprava překlepu v typu úvěru
+                const typ = loan.typ === 'Jednorazový' ? 'Jednorázový' : loan.typ;
+                
                 return {
                     ...loan,
+                    typ: typ,
                     datum_splatnosti: formatDate(loan.datum_splatnosti),
                     datum_timestamp: dateParsed ? dateParsed.getTime() : null,
                     datum_parsed_valid: !!dateParsed,
@@ -1185,8 +1189,8 @@
                 <div class="chart-card"><h3 class="chart-title">💵 Stav splacení – objem (mld. Kč)</h3><div class="chart-container"><canvas id="statusValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📊 Výše úvěru – počet úvěrů</h3><div class="chart-container"><canvas id="loanSizeCountChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">💰 Výše úvěru – objem (mld. Kč)</h3><div class="chart-container"><canvas id="loanSizeValueChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">📅 Splatnost nesplacených (měsíčně) – počet</h3><div class="chart-container"><canvas id="maturityCountChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">💵 Splatnost nesplacených (měsíčně) – objem (mld. Kč)</h3><div class="chart-container"><canvas id="maturityValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">📅 Splatnost nesplacených – počet</h3><div class="chart-container"><canvas id="maturityCountChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💵 Splatnost nesplacených – objem (mld. Kč)</h3><div class="chart-container"><canvas id="maturityValueChart"></canvas></div></div>
             `;
 
             // 1. Rating – počet úvěrů
