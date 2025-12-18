@@ -494,9 +494,10 @@
             const nesplaceno = loansWithDate.filter(l => l.stav_splaceni === 'Nesplaceno');
             const overdue = nesplaceno.filter(l => l.days_to_maturity !== null && l.days_to_maturity < 0);
             
-            const totalValue = aggregatedLoans.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0);
-            const totalCollateral = aggregatedLoans.reduce((sum, l) => sum + (l.velikost_zastavy || 0), 0);
-            const ltvValues = aggregatedLoans.filter(l => l.ltv_uveru !== null).map(l => l.ltv_uveru);
+            // Statistiky počítáme pouze z úvěrů s datem splatnosti (kromě celkových počtů)
+            const totalValue = loansWithDate.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0);
+            const totalCollateral = loansWithDate.reduce((sum, l) => sum + (l.velikost_zastavy || 0), 0);
+            const ltvValues = loansWithDate.filter(l => l.ltv_uveru !== null).map(l => l.ltv_uveru);
             const avgLtv = ltvValues.length > 0 ? ltvValues.reduce((a, b) => a + b, 0) / ltvValues.length : 0;
             
             const stats = {
@@ -515,21 +516,21 @@
                 overdue_value: overdue.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0)
             };
             
-            // Generovat insights/alerts
+            // Generovat insights/alerts (ty mohou obsahovat i úvěry bez data)
             const insights = generateInsights(aggregatedLoans, processedLoans, today);
             
-            // Statistiky podle ratingu
-            const ratingStatsAll = calculateRatingStats(aggregatedLoans);
+            // Statistiky podle ratingu (pouze úvěry s datem splatnosti)
+            const ratingStatsAll = calculateRatingStats(loansWithDate);
             const ratingStatsSplaceno = calculateRatingStats(splaceno);
             const ratingStatsNesplaceno = calculateRatingStats(nesplaceno);
             
-            // Statistiky podle typu
-            const typeStatsAll = calculateTypeStats(aggregatedLoans);
+            // Statistiky podle typu (pouze úvěry s datem splatnosti)
+            const typeStatsAll = calculateTypeStats(loansWithDate);
             const typeStatsSplaceno = calculateTypeStats(splaceno);
             const typeStatsNesplaceno = calculateTypeStats(nesplaceno);
             
-            // LTV distribuce
-            const ltvDistAll = calculateLtvDistribution(aggregatedLoans);
+            // LTV distribuce (pouze úvěry s datem splatnosti)
+            const ltvDistAll = calculateLtvDistribution(loansWithDate);
             const ltvDistSplaceno = calculateLtvDistribution(splaceno);
             const ltvDistNesplaceno = calculateLtvDistribution(nesplaceno);
             
@@ -539,22 +540,22 @@
                 { 'Stav splacení': 'Splaceno', 'Loan ID': splaceno.length, 'Výše úvěru (Kč)': stats.splaceno_value }
             ];
             
-            // Distribuce tranší
-            const tranchesDist = calculateTrancheDistribution(aggregatedLoans);
+            // Distribuce tranší (pouze úvěry s datem splatnosti)
+            const tranchesDist = calculateTrancheDistribution(loansWithDate);
             
             // Měsíční splatnosti (nesplacené)
             const monthly = calculateMonthlyMaturity(nesplaceno);
             
-            // Statistiky vlastníků
-            const ownerStatsAll = calculateOwnerStats(aggregatedLoans);
+            // Statistiky vlastníků (pouze úvěry s datem splatnosti)
+            const ownerStatsAll = calculateOwnerStats(loansWithDate);
             const ownerStatsSplaceno = calculateOwnerStats(splaceno);
             const ownerStatsNesplaceno = calculateOwnerStats(nesplaceno);
             
-            // Distribuce počtu vlastníků na úvěr
-            const ownersPerLoanDist = calculateOwnersPerLoanDistribution(aggregatedLoans);
+            // Distribuce počtu vlastníků na úvěr (pouze úvěry s datem splatnosti)
+            const ownersPerLoanDist = calculateOwnersPerLoanDistribution(loansWithDate);
             
-            // Distribuce výše úvěrů
-            const loanSizeDistAll = calculateLoanSizeDistribution(aggregatedLoans);
+            // Distribuce výše úvěrů (pouze úvěry s datem splatnosti)
+            const loanSizeDistAll = calculateLoanSizeDistribution(loansWithDate);
             const loanSizeDistSplaceno = calculateLoanSizeDistribution(splaceno);
             const loanSizeDistNesplaceno = calculateLoanSizeDistribution(nesplaceno);
             
