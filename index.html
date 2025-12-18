@@ -47,300 +47,165 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        .container { max-width: 1800px; margin: 0 auto; padding: 2rem; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 24px; }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-            gap: 1rem;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px; padding: 20px 24px;
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
         }
 
-        .logo { display: flex; align-items: center; gap: 1rem; }
-
+        .logo { display: flex; align-items: center; gap: 16px; }
         .logo-icon {
-            width: 48px; height: 48px;
-            background: var(--gradient-1);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1.25rem;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+            width: 48px; height: 48px; background: var(--gradient-1);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px; color: white;
         }
+        .logo h1 { font-size: 24px; font-weight: 700; }
+        .logo span { font-size: 14px; color: var(--text-secondary); }
 
-        .logo h1 {
-            font-size: 1.75rem; font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .logo span { font-size: 0.875rem; color: var(--text-muted); font-weight: 400; }
-
-        .header-right { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-
-        .date-badge {
-            background: var(--bg-card);
-            padding: 0.75rem 1.25rem;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .data-note {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            background: rgba(245, 158, 11, 0.1);
-            padding: 0.5rem 0.75rem;
-            border-radius: 6px;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .data-note { font-size: 12px; color: var(--accent-yellow); background: rgba(245, 158, 11, 0.1); padding: 6px 12px; border-radius: 6px; }
+        .date-badge { font-size: 13px; color: var(--text-secondary); background: var(--bg-card-hover); padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); }
 
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px; margin-bottom: 32px;
         }
-
         .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.25rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px;
+            transition: all 0.2s ease;
         }
+        .stat-card:hover { border-color: var(--accent-blue); transform: translateY(-2px); }
+        .stat-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .stat-value { font-size: 28px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gradient-1);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .stat-card:hover { transform: translateY(-4px); border-color: var(--accent-blue); box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15); }
-        .stat-card:hover::before { opacity: 1; }
-        .stat-card.danger::before { background: var(--gradient-danger); }
-        .stat-card.warning::before { background: var(--gradient-warning); }
-        .stat-card.success::before { background: var(--gradient-2); }
-
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; margin-bottom: 0.25rem; }
-        .stat-value.danger { color: var(--accent-red); }
-        .stat-value.warning { color: var(--accent-yellow); }
-        .stat-value.success { color: var(--accent-green); }
-        .stat-sub { font-size: 0.75rem; color: var(--text-secondary); }
-
-        .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
-        .section-title::before { content: ''; width: 4px; height: 24px; background: var(--gradient-1); border-radius: 2px; }
-
-        .alerts-section { margin-bottom: 2rem; }
-        .alerts-list { display: flex; flex-direction: column; gap: 1rem; }
-
+        .alerts-section { margin-bottom: 32px; }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .alerts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
         .alert-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px; cursor: pointer;
+            transition: all 0.2s ease;
         }
+        .alert-card:hover { transform: translateY(-2px); }
+        .alert-card.danger { border-left: 4px solid var(--accent-red); }
+        .alert-card.warning { border-left: 4px solid var(--accent-yellow); }
+        .alert-card.info { border-left: 4px solid var(--accent-blue); }
+        .alert-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .alert-title { font-weight: 600; font-size: 14px; }
+        .alert-count { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 20px; }
+        .alert-value { font-size: 12px; color: var(--text-secondary); }
+        .alert-items { margin-top: 12px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .alert-card.expanded .alert-items { max-height: 400px; overflow-y: auto; }
+        .alert-item { font-size: 12px; padding: 6px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .alert-item:first-child { border-top: none; }
+        .alert-item-name { color: var(--text-primary); max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .alert-item-value { color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
 
-        .alert-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); }
-
-        .alert-header {
-            padding: 1rem 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            gap: 1rem;
+        .tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+        .tab {
+            padding: 10px 20px; background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text-secondary); cursor: pointer;
+            font-size: 14px; font-weight: 500; transition: all 0.2s ease;
         }
-
-        .alert-card.danger .alert-header { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(249, 115, 22, 0.05) 100%); border-bottom: 1px solid rgba(239, 68, 68, 0.2); }
-        .alert-card.warning .alert-header { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(234, 179, 8, 0.05) 100%); border-bottom: 1px solid rgba(245, 158, 11, 0.2); }
-        .alert-card.info .alert-header { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%); border-bottom: 1px solid rgba(59, 130, 246, 0.2); }
-
-        .alert-title { font-weight: 600; display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
-        .alert-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-        .alert-card.danger .alert-icon { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
-        .alert-card.warning .alert-icon { background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow); }
-        .alert-card.info .alert-icon { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
-
-        .alert-stats { display: flex; gap: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; flex: 1; justify-content: flex-end; }
-        .alert-count { color: var(--text-primary); font-weight: 600; }
-        .alert-value { color: var(--text-secondary); }
-
-        .alert-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-        .alert-card.expanded .alert-content { max-height: 600px; }
-
-        .alert-items { padding: 1rem 1.25rem; max-height: 500px; overflow-y: auto; }
-
-        .alert-item {
-            padding: 0.75rem;
-            background: var(--bg-dark);
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            font-size: 0.8rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .alert-item:last-child { margin-bottom: 0; }
-        .alert-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-
-        .alert-item-status {
-            flex-shrink: 0;
-            padding: 0.15rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-        .alert-item-status.splaceno { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
-        .alert-item-status.nesplaceno { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
-
-        .alert-item-meta { font-family: 'JetBrains Mono', monospace; color: var(--text-secondary); white-space: nowrap; font-size: 0.75rem; flex-shrink: 0; }
-
-        .alert-toggle { width: 24px; height: 24px; border-radius: 6px; background: var(--bg-dark); display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; flex-shrink: 0; }
-        .alert-card.expanded .alert-toggle { transform: rotate(180deg); }
-
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; flex-wrap: wrap; }
-        .tab { padding: 0.75rem 1.5rem; border-radius: 8px 8px 0 0; font-weight: 500; color: var(--text-muted); background: transparent; border: none; cursor: pointer; transition: all 0.2s ease; position: relative; font-family: inherit; }
-        .tab::after { content: ''; position: absolute; bottom: -0.5rem; left: 0; right: 0; height: 2px; background: transparent; transition: background 0.2s ease; }
-        .tab:hover { color: var(--text-primary); }
-        .tab.active { color: var(--accent-blue); }
-        .tab.active::after { background: var(--accent-blue); }
+        .tab:hover { border-color: var(--accent-blue); color: var(--text-primary); }
+        .tab.active { background: var(--accent-blue); border-color: var(--accent-blue); color: white; }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
-        .chart-title { font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-secondary); }
-        .chart-container { position: relative; height: 280px; }
-        .chart-container.tall { height: 450px; }
-
-        .filters-bar {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: flex-end;
-        }
-
-        .filter-group { display: flex; flex-direction: column; gap: 0.375rem; }
-        .filter-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; }
-
+        .filter-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; }
+        .filter-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
         .filter-select, .filter-input {
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.625rem 1rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-family: inherit;
-            min-width: 150px;
-            transition: all 0.2s ease;
+            padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text-primary); font-size: 13px; min-width: 140px;
         }
+        .filter-select:focus, .filter-input:focus { outline: none; border-color: var(--accent-blue); }
 
-        .filter-select:focus, .filter-input:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
-        .filter-input { min-width: 200px; }
+        .charts-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px; margin-bottom: 32px;
+        }
+        .chart-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px;
+        }
+        .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-secondary); }
+        .chart-container { position: relative; height: 280px; }
+        .chart-container.tall { height: 400px; }
 
-        .btn { padding: 0.625rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease; border: none; font-family: inherit; }
-        .btn-primary { background: var(--gradient-1); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
-        .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
-        .btn-ghost:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .table-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden;
+        }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+        th {
+            background: var(--bg-card-hover); color: var(--text-secondary);
+            font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
+            cursor: pointer; user-select: none; white-space: nowrap;
+        }
+        th:hover { color: var(--text-primary); }
+        th.sorted { color: var(--accent-blue); }
+        th.sorted::after { content: ' ↓'; }
+        th.sorted.desc::after { content: ' ↑'; }
+        tr:hover { background: var(--bg-card-hover); }
+        td { color: var(--text-primary); white-space: nowrap; }
+        td.currency { font-family: 'JetBrains Mono', monospace; }
+        .badge {
+            display: inline-block; padding: 3px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 600;
+        }
+        .badge.danger { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+        .badge.warning { background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow); }
+        .badge.success { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .badge.info { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
 
-        .filter-spacer { flex: 1; }
-        .results-count { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: var(--text-secondary); }
-        .results-count strong { color: var(--accent-blue); }
-
-        .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-        .table-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .table-title { font-size: 1.125rem; font-weight: 600; }
-        .table-wrapper { overflow-x: auto; max-height: 600px; overflow-y: auto; }
-
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        th { position: sticky; top: 0; background: var(--bg-card); padding: 0.875rem 0.75rem; text-align: left; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; transition: color 0.2s ease; z-index: 10; }
-        th:hover { color: var(--accent-blue); }
-        th.sorted-asc::after { content: ' ▲'; color: var(--accent-blue); }
-        th.sorted-desc::after { content: ' ▼'; color: var(--accent-blue); }
-        td { padding: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
-        tr:hover td { background: var(--bg-card-hover); color: var(--text-primary); }
-
-        .cell-name { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 500; }
-        .cell-owner { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .cell-number { font-family: 'JetBrains Mono', monospace; text-align: right; }
-
-        .badge { display: inline-flex; align-items: center; padding: 0.2rem 0.5rem; border-radius: 5px; font-size: 0.7rem; font-weight: 600; }
-        .badge-rating { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
-        .badge-rating.a { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
-        .badge-rating.b { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
-        .badge-rating.c { background: rgba(245, 158, 11, 0.15); color: var(--accent-yellow); }
-        .badge-type { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
-        .badge-status { padding: 0.2rem 0.4rem; }
-        .badge-status.splaceno { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
-        .badge-status.nesplaceno { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
-        .badge-warning { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); font-size: 0.65rem; }
-        .badge-info { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); font-size: 0.65rem; }
-        .badge-caution { background: rgba(245, 158, 11, 0.15); color: var(--accent-yellow); font-size: 0.65rem; }
-
-        .ltv-bar { width: 50px; height: 5px; background: var(--bg-dark); border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 0.4rem; }
-        .ltv-fill { height: 100%; border-radius: 3px; background: var(--accent-green); transition: width 0.3s ease; }
-        .ltv-fill.medium { background: var(--accent-yellow); }
-        .ltv-fill.high { background: var(--accent-red); }
-
-        .pagination { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1rem; }
-        .page-info { font-size: 0.8rem; color: var(--text-secondary); }
-        .page-buttons { display: flex; gap: 0.375rem; }
-        .page-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
-        .page-btn:hover:not(:disabled) { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--accent-blue); }
-        .page-btn.active { background: var(--gradient-1); border-color: transparent; color: white; }
+        .pagination {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px; border-top: 1px solid var(--border);
+        }
+        .page-info { font-size: 13px; color: var(--text-secondary); }
+        .page-buttons { display: flex; gap: 8px; }
+        .page-btn {
+            padding: 6px 12px; background: var(--bg-card-hover); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text-primary); cursor: pointer; font-size: 13px;
+        }
+        .page-btn:hover { border-color: var(--accent-blue); }
         .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .page-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); }
 
-        .owners-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
-        .sub-section { margin-top: 2rem; }
-        .sub-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-secondary); }
-
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-        @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            header { flex-direction: column; gap: 1rem; align-items: flex-start; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .charts-grid, .owners-grid { grid-template-columns: 1fr; }
-            .filters-bar { flex-direction: column; align-items: stretch; }
-            .filter-select, .filter-input { width: 100%; }
+        .reset-btn {
+            padding: 8px 16px; background: var(--accent-red); border: none;
+            border-radius: 6px; color: white; cursor: pointer; font-size: 13px; font-weight: 500;
         }
+        .reset-btn:hover { opacity: 0.9; }
 
-        .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: var(--text-muted); }
-        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+        .owners-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .sub-section { margin-top: 32px; }
+        .sub-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+
+        .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
         .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
         .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
         
         .error-message { text-align: center; padding: 3rem; color: var(--accent-red); }
         .error-message h3 { margin-bottom: 1rem; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 16px; text-align: center; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .owners-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -373,7 +238,7 @@
         // =============================================================================
         // KONFIGURACE
         // =============================================================================
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHKkUe_RodISX4BbRlCngrtIlRGIRJZH9Yk-cYjW_mXdFZuwd1NHz8f0jVMm6GYf2h/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeIxwaIs96MExSVBoJjTYVMiRbN027M5V5kbr7MPrZR6JqMb4Weho4IQK4BLtpSYvy/exec';
         
         // =============================================================================
         // GLOBÁLNÍ PROMĚNNÉ
@@ -404,6 +269,32 @@
             return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
         }
 
+        function formatDateTimePrague(isoString) {
+            if (!isoString) return '';
+            const d = new Date(isoString);
+            if (isNaN(d.getTime())) return isoString;
+            
+            // Formátování pro časové pásmo Praha (Europe/Prague)
+            const options = {
+                timeZone: 'Europe/Prague',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            
+            const formatter = new Intl.DateTimeFormat('cs-CZ', options);
+            const parts = formatter.formatToParts(d);
+            
+            const dateParts = {};
+            parts.forEach(p => { dateParts[p.type] = p.value; });
+            
+            return `Data k ${dateParts.year}-${dateParts.month}-${dateParts.day} , ${dateParts.hour}:${dateParts.minute}:${dateParts.second}`;
+        }
+
         function daysDiff(date1, date2) {
             return Math.floor((date1 - date2) / (1000 * 60 * 60 * 24));
         }
@@ -419,10 +310,7 @@
                 const rawData = await response.json();
                 if (rawData.error) throw new Error(rawData.error);
                 
-                // Transformovat data do formátu pro dashboard
                 DATA = transformData(rawData);
-                
-                // Vykreslit dashboard
                 renderDashboard();
                 
             } catch (error) {
@@ -434,7 +322,6 @@
                         <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
                             Zkontroluj, že data byla exportována ze SysLoanu pomocí Tampermonkey skriptu.
                         </p>
-                        <button onclick="loadData()" class="btn btn-primary" style="margin-top: 1.5rem;">Zkusit znovu</button>
                     </div>
                 `;
             }
@@ -443,247 +330,205 @@
         // =============================================================================
         // TRANSFORMACE DAT
         // =============================================================================
-        function transformData(rawData) {
-            const loans = rawData.loans || [];
+        function transformData(raw) {
+            const loans = raw.loans || [];
+            const tranches = raw.tranches || [];
+            const timestamp = raw.timestamp || new Date().toISOString();
+            
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Přidat vypočtené hodnoty k úvěrům
-            const processedLoans = loans.map(loan => {
-                const dateParsed = parseDate(loan.datum_splatnosti);
-                const daysToMaturity = dateParsed ? daysDiff(dateParsed, today) : null;
-                const ltvUveru = loan.ltv_uveru ? loan.ltv_uveru * 100 : null;
-                const ltvTranse = loan.ltv_transe ? loan.ltv_transe * 100 : null;
-                
-                return {
-                    ...loan,
-                    datum_splatnosti: formatDate(loan.datum_splatnosti),
-                    datum_timestamp: dateParsed ? dateParsed.getTime() : null,
-                    datum_parsed_valid: !!dateParsed,
-                    days_to_maturity: daysToMaturity,
-                    ltv_uveru: ltvUveru,
-                    ltv_transe: ltvTranse,
-                    velikost_zastavy: loan.zastava || 0,
-                    uver_nad_ramec: loan.vyse_uveru > loan.vyse_ramec && loan.vyse_ramec > 0
-                };
-            });
-            
-            // Agregovat úvěry (seskupit tranše do jednoho úvěru)
-            const loansMap = new Map();
-            processedLoans.forEach(item => {
-                if (!loansMap.has(item.loan_id)) {
-                    loansMap.set(item.loan_id, {
-                        ...item,
-                        tranches_count: 1,
-                        vyse_uveru: item.vyse_uveru || 0,
-                        velikost_zastavy: item.velikost_zastavy || 0
-                    });
-                } else {
-                    const existing = loansMap.get(item.loan_id);
-                    existing.tranches_count++;
-                    existing.vyse_uveru = Math.max(existing.vyse_uveru, item.vyse_uveru || 0);
-                    existing.velikost_zastavy = Math.max(existing.velikost_zastavy, item.velikost_zastavy || 0);
+            // Zpracování úvěrů
+            loans.forEach(loan => {
+                loan.datum_parsed = parseDate(loan.datum_splatnosti);
+                loan.datum_parsed_valid = loan.datum_parsed && !isNaN(loan.datum_parsed.getTime());
+                if (loan.datum_parsed_valid) {
+                    loan.days_to_maturity = daysDiff(loan.datum_parsed, today);
                 }
             });
-            const aggregatedLoans = Array.from(loansMap.values());
             
-            // Vypočítat statistiky
-            const loansWithDate = aggregatedLoans.filter(l => l.datum_parsed_valid);
-            const loansWithoutDate = aggregatedLoans.filter(l => !l.datum_parsed_valid);
-            const splaceno = loansWithDate.filter(l => l.stav_splaceni === 'Splaceno');
-            const nesplaceno = loansWithDate.filter(l => l.stav_splaceni === 'Nesplaceno');
-            const overdue = nesplaceno.filter(l => l.days_to_maturity !== null && l.days_to_maturity < 0);
-            
-            const totalValue = aggregatedLoans.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0);
-            const totalCollateral = aggregatedLoans.reduce((sum, l) => sum + (l.velikost_zastavy || 0), 0);
-            const ltvValues = aggregatedLoans.filter(l => l.ltv_uveru !== null).map(l => l.ltv_uveru);
-            const avgLtv = ltvValues.length > 0 ? ltvValues.reduce((a, b) => a + b, 0) / ltvValues.length : 0;
-            
+            // Statistiky
+            const loansWithDate = loans.filter(l => l.datum_parsed_valid);
             const stats = {
-                total_loans: aggregatedLoans.length,
+                total_loans: loans.length,
                 total_loans_with_date: loansWithDate.length,
-                total_loans_without_date: loansWithoutDate.length,
-                total_tranches: processedLoans.length,
-                total_value: totalValue,
-                total_collateral: totalCollateral,
-                avg_ltv: avgLtv,
-                splaceno_count: splaceno.length,
-                splaceno_value: splaceno.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                nesplaceno_count: nesplaceno.length,
-                nesplaceno_value: nesplaceno.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                overdue_count: overdue.length,
-                overdue_value: overdue.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0)
+                total_tranches: tranches.length,
+                total_value: loans.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                total_receivables: loans.reduce((sum, l) => sum + (l.pohledavky || 0), 0),
+                overdue_count: loansWithDate.filter(l => l.days_to_maturity < 0 && l.stav_splaceni !== 'Splaceno').length,
+                due_30_days: loansWithDate.filter(l => l.days_to_maturity >= 0 && l.days_to_maturity <= 30 && l.stav_splaceni !== 'Splaceno').length,
+                due_90_days: loansWithDate.filter(l => l.days_to_maturity >= 0 && l.days_to_maturity <= 90 && l.stav_splaceni !== 'Splaceno').length
             };
             
-            // Generovat insights/alerts
-            const insights = generateInsights(aggregatedLoans, processedLoans, today);
+            // Insights
+            const insights = generateInsights(loans, loansWithDate, today);
             
-            // Statistiky podle ratingu
-            const ratingStatsAll = calculateRatingStats(aggregatedLoans);
-            const ratingStatsSplaceno = calculateRatingStats(splaceno);
-            const ratingStatsNesplaceno = calculateRatingStats(nesplaceno);
+            // Rating stats
+            const ratingStatsAll = calculateRatingStats(loans);
+            const ratingStatsSplaceno = calculateRatingStats(loans.filter(l => l.stav_splaceni === 'Splaceno'));
+            const ratingStatsNesplaceno = calculateRatingStats(loans.filter(l => l.stav_splaceni !== 'Splaceno'));
             
-            // Statistiky podle typu
-            const typeStatsAll = calculateTypeStats(aggregatedLoans);
-            const typeStatsSplaceno = calculateTypeStats(splaceno);
-            const typeStatsNesplaceno = calculateTypeStats(nesplaceno);
+            // Type stats
+            const typeStatsAll = calculateTypeStats(loans);
+            const typeStatsSplaceno = calculateTypeStats(loans.filter(l => l.stav_splaceni === 'Splaceno'));
+            const typeStatsNesplaceno = calculateTypeStats(loans.filter(l => l.stav_splaceni !== 'Splaceno'));
             
-            // LTV distribuce
-            const ltvDistAll = calculateLtvDistribution(aggregatedLoans);
-            const ltvDistSplaceno = calculateLtvDistribution(splaceno);
-            const ltvDistNesplaceno = calculateLtvDistribution(nesplaceno);
+            // Status stats
+            const statusStats = calculateStatusStats(loans);
             
-            // Statistiky stavu splacení
-            const statusStats = [
-                { 'Stav splacení': 'Nesplaceno', 'Loan ID': nesplaceno.length, 'Výše úvěru (Kč)': stats.nesplaceno_value },
-                { 'Stav splacení': 'Splaceno', 'Loan ID': splaceno.length, 'Výše úvěru (Kč)': stats.splaceno_value }
-            ];
+            // LTV distribution
+            const ltvDistributionAll = calculateLtvDistribution(loans);
+            const ltvDistributionSplaceno = calculateLtvDistribution(loans.filter(l => l.stav_splaceni === 'Splaceno'));
+            const ltvDistributionNesplaceno = calculateLtvDistribution(loans.filter(l => l.stav_splaceni !== 'Splaceno'));
             
-            // Distribuce tranší
-            const tranchesDist = calculateTrancheDistribution(aggregatedLoans);
+            // Loan value distribution (NEW)
+            const loanValueDistributionAll = calculateLoanValueDistribution(loans);
+            const loanValueDistributionSplaceno = calculateLoanValueDistribution(loans.filter(l => l.stav_splaceni === 'Splaceno'));
+            const loanValueDistributionNesplaceno = calculateLoanValueDistribution(loans.filter(l => l.stav_splaceni !== 'Splaceno'));
             
-            // Měsíční splatnosti (nesplacené)
-            const monthly = calculateMonthlyMaturity(nesplaceno);
+            // Tranches distribution
+            const tranchesDistribution = calculateTranchesDistribution(loans);
             
-            // Statistiky vlastníků
-            const ownerStatsAll = calculateOwnerStats(aggregatedLoans);
-            const ownerStatsSplaceno = calculateOwnerStats(splaceno);
-            const ownerStatsNesplaceno = calculateOwnerStats(nesplaceno);
+            // Owners distribution (NEW)
+            const ownersDistribution = calculateOwnersDistribution(loans);
             
-            // Filtry
-            const typy = [...new Set(aggregatedLoans.map(l => l.typ))].filter(Boolean).sort();
-            const ratings = [...new Set(aggregatedLoans.map(l => l.rating))].filter(Boolean).sort();
-            const stavy = [...new Set(aggregatedLoans.map(l => l.stav_splaceni))].filter(Boolean).sort();
+            // Monthly maturity
+            const monthlyNesplaceno = calculateMonthlyMaturity(loansWithDate.filter(l => l.stav_splaceni !== 'Splaceno'));
+            
+            // Owner stats
+            const ownerStats = calculateOwnerStats(loans);
+            const ownerStatsSplaceno = calculateOwnerStats(loans.filter(l => l.stav_splaceni === 'Splaceno'));
+            const ownerStatsNesplaceno = calculateOwnerStats(loans.filter(l => l.stav_splaceni !== 'Splaceno'));
+            
+            // Filters
+            const filters = {
+                typy: [...new Set(loans.map(l => l.typ_uveru).filter(Boolean))].sort(),
+                ratings: [...new Set(loans.map(l => l.rating).filter(Boolean))].sort(),
+                stavy: [...new Set(loans.map(l => l.stav_splaceni).filter(Boolean))].sort()
+            };
             
             return {
-                loans: aggregatedLoans,
-                tranches: processedLoans,
+                timestamp,
                 stats,
                 insights,
+                loans,
+                tranches,
                 rating_stats_all: ratingStatsAll,
                 rating_stats_splaceno: ratingStatsSplaceno,
                 rating_stats_nesplaceno: ratingStatsNesplaceno,
                 type_stats_all: typeStatsAll,
                 type_stats_splaceno: typeStatsSplaceno,
                 type_stats_nesplaceno: typeStatsNesplaceno,
-                ltv_distribution_all: ltvDistAll,
-                ltv_distribution_splaceno: ltvDistSplaceno,
-                ltv_distribution_nesplaceno: ltvDistNesplaceno,
                 status_stats: statusStats,
-                tranches_distribution: tranchesDist,
-                monthly,
-                owner_stats_all: ownerStatsAll,
+                ltv_distribution_all: ltvDistributionAll,
+                ltv_distribution_splaceno: ltvDistributionSplaceno,
+                ltv_distribution_nesplaceno: ltvDistributionNesplaceno,
+                loan_value_distribution_all: loanValueDistributionAll,
+                loan_value_distribution_splaceno: loanValueDistributionSplaceno,
+                loan_value_distribution_nesplaceno: loanValueDistributionNesplaceno,
+                tranches_distribution: tranchesDistribution,
+                owners_distribution: ownersDistribution,
+                monthly: monthlyNesplaceno,
+                owner_stats: ownerStats,
                 owner_stats_splaceno: ownerStatsSplaceno,
                 owner_stats_nesplaceno: ownerStatsNesplaceno,
-                filters: { typy, ratings, stavy },
-                meta: rawData.meta || {},
-                exportedAtFormatted: rawData.exportedAtFormatted || ''
+                filters
             };
         }
 
-        function generateInsights(loans, tranches, today) {
+        function generateInsights(loans, loansWithDate, today) {
             const insights = [];
             
-            // Po splatnosti (nesplacené)
-            const overdue = loans.filter(l => l.stav_splaceni === 'Nesplaceno' && l.days_to_maturity !== null && l.days_to_maturity < 0);
+            // Po splatnosti
+            const overdue = loansWithDate.filter(l => l.days_to_maturity < 0 && l.stav_splaceni !== 'Splaceno');
             if (overdue.length > 0) {
                 insights.push({
                     type: 'danger',
-                    title: '🚨 Úvěry po splatnosti (nesplacené)',
+                    title: '🚨 Po splatnosti',
                     count: overdue.length,
                     value: overdue.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
                     items: overdue.sort((a, b) => a.days_to_maturity - b.days_to_maturity).slice(0, 20).map(l => ({
                         name: l.jmeno,
-                        date: l.datum_splatnosti,
-                        days: Math.abs(l.days_to_maturity),
                         value: l.vyse_uveru,
-                        stav_splaceni: l.stav_splaceni
+                        extra: `${Math.abs(l.days_to_maturity)} dní`
                     }))
                 });
             }
             
-            // Splatnost do 30 dní (nesplacené)
-            const soon30 = loans.filter(l => l.stav_splaceni === 'Nesplaceno' && l.days_to_maturity !== null && l.days_to_maturity >= 0 && l.days_to_maturity <= 30);
-            if (soon30.length > 0) {
+            // Splatnost do 30 dní
+            const due30 = loansWithDate.filter(l => l.days_to_maturity >= 0 && l.days_to_maturity <= 30 && l.stav_splaceni !== 'Splaceno');
+            if (due30.length > 0) {
                 insights.push({
                     type: 'warning',
-                    title: '⚠️ Splatnost do 30 dní (nesplacené)',
-                    count: soon30.length,
-                    value: soon30.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: soon30.sort((a, b) => a.days_to_maturity - b.days_to_maturity).slice(0, 20).map(l => ({
+                    title: '⚠️ Splatnost do 30 dní',
+                    count: due30.length,
+                    value: due30.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: due30.sort((a, b) => a.days_to_maturity - b.days_to_maturity).slice(0, 20).map(l => ({
                         name: l.jmeno,
-                        date: l.datum_splatnosti,
-                        days: l.days_to_maturity,
                         value: l.vyse_uveru,
-                        stav_splaceni: l.stav_splaceni
+                        extra: `${l.days_to_maturity} dní`
                     }))
                 });
             }
             
-            // Splatnost 30-90 dní (nesplacené)
-            const soon90 = loans.filter(l => l.stav_splaceni === 'Nesplaceno' && l.days_to_maturity !== null && l.days_to_maturity > 30 && l.days_to_maturity <= 90);
-            if (soon90.length > 0) {
+            // Splatnost do 90 dní
+            const due90 = loansWithDate.filter(l => l.days_to_maturity > 30 && l.days_to_maturity <= 90 && l.stav_splaceni !== 'Splaceno');
+            if (due90.length > 0) {
                 insights.push({
                     type: 'warning',
-                    title: '⚠️ Splatnost 30-90 dní (nesplacené)',
-                    count: soon90.length,
-                    value: soon90.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: soon90.sort((a, b) => a.days_to_maturity - b.days_to_maturity).slice(0, 20).map(l => ({
+                    title: '⚠️ Splatnost do 90 dní',
+                    count: due90.length,
+                    value: due90.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: due90.sort((a, b) => a.days_to_maturity - b.days_to_maturity).slice(0, 20).map(l => ({
                         name: l.jmeno,
-                        date: l.datum_splatnosti,
-                        days: l.days_to_maturity,
                         value: l.vyse_uveru,
-                        stav_splaceni: l.stav_splaceni
+                        extra: `${l.days_to_maturity} dní`
                     }))
                 });
             }
             
-            // Vysoké LTV (> 75%)
-            const highLtv = loans.filter(l => l.ltv_uveru !== null && l.ltv_uveru > 75);
-            if (highLtv.length > 0) {
-                insights.push({
-                    type: 'warning',
-                    title: '⚠️ Vysoké LTV (> 75%)',
-                    count: highLtv.length,
-                    value: highLtv.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: highLtv.sort((a, b) => b.ltv_uveru - a.ltv_uveru).slice(0, 20).map(l => ({
-                        name: l.jmeno,
-                        ltv: l.ltv_uveru,
-                        value: l.vyse_uveru,
-                        stav_splaceni: l.stav_splaceni
-                    }))
-                });
-            }
-            
-            // Překročený rámec
-            const overFrame = loans.filter(l => l.uver_nad_ramec);
+            // Překračuje rámec
+            const overFrame = loans.filter(l => l.uver_ramec === true || l.uver_ramec === 'Ano');
             if (overFrame.length > 0) {
                 insights.push({
                     type: 'danger',
-                    title: '🚨 Úvěry překračující rámec',
+                    title: '🚨 Překračuje rámec',
                     count: overFrame.length,
                     value: overFrame.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
                     items: overFrame.slice(0, 20).map(l => ({
                         name: l.jmeno,
-                        uver: l.vyse_uveru,
-                        ramec: l.vyse_ramec,
-                        diff: l.vyse_uveru - l.vyse_ramec,
+                        value: l.vyse_uveru,
                         stav_splaceni: l.stav_splaceni
                     }))
                 });
             }
             
-            // Prodloužené úvěry
-            const prolonged = loans.filter(l => l.prodlouzeni && l.prodlouzeni > 0);
-            if (prolonged.length > 0) {
+            // Vysoké LTV (>75%)
+            const highLtv = loans.filter(l => l.ltv > 75 && l.stav_splaceni !== 'Splaceno');
+            if (highLtv.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    title: '⚠️ Vysoké LTV (>75%)',
+                    count: highLtv.length,
+                    value: highLtv.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: highLtv.sort((a, b) => (b.ltv || 0) - (a.ltv || 0)).slice(0, 20).map(l => ({
+                        name: l.jmeno,
+                        value: l.vyse_uveru,
+                        extra: `LTV ${l.ltv?.toFixed(1)}%`
+                    }))
+                });
+            }
+            
+            // Prodloužené
+            const extended = loans.filter(l => l.prodlouzeni === true || l.prodlouzeni === 'Ano');
+            if (extended.length > 0) {
                 insights.push({
                     type: 'info',
                     title: 'ℹ️ Prodloužené úvěry',
-                    count: prolonged.length,
-                    value: prolonged.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: prolonged.sort((a, b) => b.prodlouzeni - a.prodlouzeni).slice(0, 20).map(l => ({
+                    count: extended.length,
+                    value: extended.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: extended.slice(0, 20).map(l => ({
                         name: l.jmeno,
-                        prodlouzeni: l.prodlouzeni,
                         value: l.vyse_uveru,
                         stav_splaceni: l.stav_splaceni
                     }))
@@ -706,48 +551,61 @@
                 });
             }
             
+            // NOVÉ: Úvěry s kladnou pohledávkou
+            const posReceivables = loans.filter(l => (l.pohledavky || 0) > 0);
+            if (posReceivables.length > 0) {
+                const totalReceivables = posReceivables.reduce((sum, l) => sum + (l.pohledavky || 0), 0);
+                insights.push({
+                    type: 'warning',
+                    title: '⚠️ Úvěry s kladnou pohledávkou',
+                    count: posReceivables.length,
+                    value: totalReceivables,
+                    items: posReceivables.sort((a, b) => (b.pohledavky || 0) - (a.pohledavky || 0)).slice(0, 20).map(l => ({
+                        name: l.jmeno,
+                        value: l.pohledavky,
+                        extra: `Úvěr: ${formatCurrency(l.vyse_uveru)}`
+                    }))
+                });
+            }
+            
             return insights;
         }
 
         function calculateRatingStats(loans) {
-            const byRating = {};
+            const grouped = {};
             loans.forEach(l => {
                 const rating = l.rating || 'N/A';
-                if (!byRating[rating]) {
-                    byRating[rating] = { count: 0, value: 0, ltvSum: 0, ltvCount: 0 };
-                }
-                byRating[rating].count++;
-                byRating[rating].value += l.vyse_uveru || 0;
-                if (l.ltv_uveru !== null) {
-                    byRating[rating].ltvSum += l.ltv_uveru;
-                    byRating[rating].ltvCount++;
-                }
+                if (!grouped[rating]) grouped[rating] = { 'Rating': rating, 'Loan ID': 0, 'Výše úvěru (Kč)': 0, ltvSum: 0 };
+                grouped[rating]['Loan ID']++;
+                grouped[rating]['Výše úvěru (Kč)'] += l.vyse_uveru || 0;
+                grouped[rating].ltvSum += l.ltv || 0;
             });
-            
-            return Object.entries(byRating).map(([rating, data]) => ({
-                Rating: rating,
-                'Loan ID': data.count,
-                'Výše úvěru (Kč)': data.value,
-                LTV_num: data.ltvCount > 0 ? data.ltvSum / data.ltvCount : 0
-            })).sort((a, b) => a.Rating.localeCompare(b.Rating));
+            return Object.values(grouped).map(g => ({
+                ...g,
+                avgLtv: g['Loan ID'] > 0 ? g.ltvSum / g['Loan ID'] : 0
+            }));
         }
 
         function calculateTypeStats(loans) {
-            const byType = {};
+            const grouped = {};
             loans.forEach(l => {
-                const typ = l.typ || 'N/A';
-                if (!byType[typ]) {
-                    byType[typ] = { count: 0, value: 0 };
-                }
-                byType[typ].count++;
-                byType[typ].value += l.vyse_uveru || 0;
+                const typ = l.typ_uveru || 'N/A';
+                if (!grouped[typ]) grouped[typ] = { 'Typ úvěru': typ, 'Loan ID': 0, 'Výše úvěru (Kč)': 0 };
+                grouped[typ]['Loan ID']++;
+                grouped[typ]['Výše úvěru (Kč)'] += l.vyse_uveru || 0;
             });
-            
-            return Object.entries(byType).map(([typ, data]) => ({
-                'Typ úvěru': typ,
-                'Loan ID': data.count,
-                'Výše úvěru (Kč)': data.value
-            }));
+            return Object.values(grouped);
+        }
+
+        function calculateStatusStats(loans) {
+            const grouped = {};
+            loans.forEach(l => {
+                const stav = l.stav_splaceni || 'N/A';
+                if (!grouped[stav]) grouped[stav] = { 'Stav splacení': stav, 'Loan ID': 0, 'Výše úvěru (Kč)': 0 };
+                grouped[stav]['Loan ID']++;
+                grouped[stav]['Výše úvěru (Kč)'] += l.vyse_uveru || 0;
+            });
+            return Object.values(grouped);
         }
 
         function calculateLtvDistribution(loans) {
@@ -761,7 +619,7 @@
             ];
             
             return ranges.map(r => {
-                const inRange = loans.filter(l => l.ltv_uveru !== null && l.ltv_uveru > r.min && l.ltv_uveru <= r.max);
+                const inRange = loans.filter(l => l.ltv >= r.min && l.ltv < r.max);
                 return {
                     range: r.range,
                     count: inRange.length,
@@ -770,87 +628,100 @@
             });
         }
 
-        function calculateTrancheDistribution(loans) {
-            const dist = {};
-            loans.forEach(l => {
-                const count = l.tranches_count || 1;
-                if (!dist[count]) dist[count] = 0;
-                dist[count]++;
-            });
+        function calculateLoanValueDistribution(loans) {
+            const ranges = [
+                { range: '0-10 mil.', min: 0, max: 10000000 },
+                { range: '10-20 mil.', min: 10000000, max: 20000000 },
+                { range: '20-30 mil.', min: 20000000, max: 30000000 },
+                { range: '30-50 mil.', min: 30000000, max: 50000000 },
+                { range: '50-100 mil.', min: 50000000, max: 100000000 },
+                { range: '100+ mil.', min: 100000000, max: Infinity }
+            ];
             
-            return Object.entries(dist)
-                .map(([tranches, count]) => ({ tranches: parseInt(tranches), count }))
-                .sort((a, b) => a.tranches - b.tranches);
+            return ranges.map(r => {
+                const inRange = loans.filter(l => (l.vyse_uveru || 0) >= r.min && (l.vyse_uveru || 0) < r.max);
+                return {
+                    range: r.range,
+                    count: inRange.length,
+                    value: inRange.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0)
+                };
+            });
+        }
+
+        function calculateTranchesDistribution(loans) {
+            const grouped = {};
+            loans.forEach(l => {
+                const count = l.pocet_transi || 1;
+                if (!grouped[count]) grouped[count] = { tranches: count, count: 0 };
+                grouped[count].count++;
+            });
+            return Object.values(grouped).sort((a, b) => a.tranches - b.tranches);
+        }
+
+        function calculateOwnersDistribution(loans) {
+            const grouped = {};
+            loans.forEach(l => {
+                const count = l.pocet_vlastniku || 1;
+                if (!grouped[count]) grouped[count] = { owners: count, count: 0 };
+                grouped[count].count++;
+            });
+            return Object.values(grouped).sort((a, b) => a.owners - b.owners);
         }
 
         function calculateMonthlyMaturity(loans) {
-            const monthly = {};
+            const grouped = {};
             loans.forEach(l => {
-                if (!l.datum_timestamp) return;
-                const d = new Date(l.datum_timestamp);
-                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                if (!monthly[key]) monthly[key] = { count: 0, value: 0 };
-                monthly[key].count++;
-                monthly[key].value += l.vyse_uveru || 0;
+                if (!l.datum_parsed_valid) return;
+                const month = `${l.datum_parsed.getFullYear()}-${String(l.datum_parsed.getMonth() + 1).padStart(2, '0')}`;
+                if (!grouped[month]) grouped[month] = { month, 'Loan ID': 0, 'Výše úvěru (Kč)': 0 };
+                grouped[month]['Loan ID']++;
+                grouped[month]['Výše úvěru (Kč)'] += l.vyse_uveru || 0;
             });
-            
-            return Object.entries(monthly)
-                .map(([month, data]) => ({
-                    month,
-                    'Loan ID': data.count,
-                    'Výše úvěru (Kč)': data.value
-                }))
-                .sort((a, b) => a.month.localeCompare(b.month));
+            return Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month));
         }
 
         function calculateOwnerStats(loans) {
-            const byOwner = {};
+            const grouped = {};
             loans.forEach(l => {
                 const owner = l.vlastnik || 'N/A';
-                if (!byOwner[owner]) {
-                    byOwner[owner] = { count: 0, value: 0 };
-                }
-                byOwner[owner].count++;
-                byOwner[owner].value += l.vyse_uveru || 0;
+                if (!grouped[owner]) grouped[owner] = { owner, count: 0, value: 0 };
+                grouped[owner].count++;
+                grouped[owner].value += l.vyse_uveru || 0;
             });
-            
-            return Object.entries(byOwner)
-                .map(([vlastnik, data]) => ({
-                    vlastnik,
-                    count: data.count,
-                    value: data.value
-                }))
-                .sort((a, b) => b.value - a.value);
+            return Object.values(grouped).sort((a, b) => b.value - a.value);
         }
 
         // =============================================================================
         // VYKRESLENÍ DASHBOARDU
         // =============================================================================
         function renderDashboard() {
-            // Aktualizovat timestamp
-            const timestamp = DATA.meta?.lastUpdateFormatted || DATA.exportedAtFormatted || 'Neznámé';
-            document.getElementById('dateBadge').textContent = `📅 Data k ${timestamp}`;
-            document.getElementById('missingDateCount').textContent = DATA.stats.total_loans_without_date;
+            const mainContent = document.getElementById('mainContent');
             
-            // Vykreslit hlavní obsah
-            document.getElementById('mainContent').innerHTML = `
+            // Update date badge s novým formátem
+            document.getElementById('dateBadge').textContent = '📅 ' + formatDateTimePrague(DATA.timestamp);
+            document.getElementById('missingDateCount').textContent = DATA.stats.total_loans - DATA.stats.total_loans_with_date;
+            
+            mainContent.innerHTML = `
+                <!-- Stats -->
                 <div class="stats-grid" id="statsGrid"></div>
                 
+                <!-- Alerts -->
                 <div class="alerts-section">
                     <h2 class="section-title">⚠️ Upozornění a Insights</h2>
-                    <div class="alerts-list" id="alertsGrid"></div>
+                    <div class="alerts-grid" id="alertsGrid"></div>
                 </div>
                 
-                <div class="tabs">
+                <!-- Tabs -->
+                <div class="tabs" id="tabsContainer">
                     <button class="tab active" data-tab="overview">📊 Přehled</button>
-                    <button class="tab" data-tab="table">📋 Úvěry</button>
+                    <button class="tab" data-tab="table">📋 Tabulka úvěrů</button>
                     <button class="tab" data-tab="tranches">📑 Tranše</button>
                     <button class="tab" data-tab="owners">👥 Vlastníci</button>
                 </div>
                 
                 <!-- Overview Tab -->
                 <div id="overview" class="tab-content active">
-                    <div class="filters-bar">
+                    <div class="filter-row">
                         <div class="filter-group">
                             <label class="filter-label">Stav splacení</label>
                             <select class="filter-select" id="filterOverviewStatus">
@@ -865,10 +736,10 @@
                 
                 <!-- Table Tab -->
                 <div id="table" class="tab-content">
-                    <div class="filters-bar">
+                    <div class="filter-row">
                         <div class="filter-group">
                             <label class="filter-label">Hledat</label>
-                            <input type="text" class="filter-input" id="searchInput" placeholder="Název úvěru nebo vlastník...">
+                            <input type="text" class="filter-input" id="searchInput" placeholder="Název úvěru...">
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">Typ úvěru</label>
@@ -886,9 +757,9 @@
                             <label class="filter-label">LTV</label>
                             <select class="filter-select" id="filterLTV">
                                 <option value="">Vše</option>
-                                <option value="low">≤ 60%</option>
-                                <option value="medium">60-75%</option>
-                                <option value="high">> 75%</option>
+                                <option value="0-50">0-50%</option>
+                                <option value="50-75">50-75%</option>
+                                <option value="75+">75%+</option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -896,22 +767,29 @@
                             <select class="filter-select" id="filterProblems">
                                 <option value="">Vše</option>
                                 <option value="overdue">Po splatnosti</option>
-                                <option value="soon30">Splatnost do 30 dní</option>
-                                <option value="soon90">Splatnost do 90 dní</option>
-                                <option value="highltv">Vysoké LTV (>75%)</option>
-                                <option value="overframe">Překročený rámec</option>
-                                <option value="prolonged">Prodlouženo</option>
-                                <option value="nodate">Bez data splatnosti</option>
+                                <option value="highltv">Vysoké LTV</option>
+                                <option value="extended">Prodloužené</option>
                             </select>
                         </div>
-                        <div class="filter-spacer"></div>
-                        <button class="btn btn-ghost" id="resetFilters">Resetovat</button>
-                        <div class="results-count" id="resultsCount"></div>
+                        <button class="reset-btn" id="resetFilters">Reset</button>
                     </div>
                     <div class="table-card">
-                        <div class="table-header"><h3 class="table-title">Detailní přehled úvěrů</h3></div>
                         <div class="table-wrapper">
-                            <table id="dataTable"><thead><tr id="tableHeader"></tr></thead><tbody id="tableBody"></tbody></table>
+                            <table id="loansTable">
+                                <thead id="loansTableHeader">
+                                    <tr>
+                                        <th data-column="jmeno">Název</th>
+                                        <th data-column="typ_uveru">Typ</th>
+                                        <th data-column="rating">Rating</th>
+                                        <th data-column="vyse_uveru">Výše úvěru</th>
+                                        <th data-column="ltv">LTV</th>
+                                        <th data-column="datum_splatnosti">Splatnost</th>
+                                        <th data-column="stav_splaceni">Stav</th>
+                                        <th data-column="vlastnik">Vlastník</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="loansTableBody"></tbody>
+                            </table>
                         </div>
                         <div class="pagination">
                             <div class="page-info" id="pageInfo"></div>
@@ -922,7 +800,7 @@
                 
                 <!-- Tranches Tab -->
                 <div id="tranches" class="tab-content">
-                    <div class="filters-bar">
+                    <div class="filter-row">
                         <div class="filter-group">
                             <label class="filter-label">Hledat</label>
                             <input type="text" class="filter-input" id="searchInputTranche" placeholder="Název úvěru...">
@@ -935,23 +813,23 @@
                             <label class="filter-label">Stav splacení</label>
                             <select class="filter-select" id="filterStatusTranche"><option value="">Vše</option></select>
                         </div>
-                        <div class="filter-group">
-                            <label class="filter-label">LTV tranše</label>
-                            <select class="filter-select" id="filterLTVTranche">
-                                <option value="">Vše</option>
-                                <option value="low">≤ 60%</option>
-                                <option value="medium">60-75%</option>
-                                <option value="high">> 75%</option>
-                            </select>
-                        </div>
-                        <div class="filter-spacer"></div>
-                        <button class="btn btn-ghost" id="resetFiltersTranche">Resetovat</button>
-                        <div class="results-count" id="resultsCountTranche"></div>
+                        <button class="reset-btn" id="resetFiltersTranche">Reset</button>
                     </div>
                     <div class="table-card">
-                        <div class="table-header"><h3 class="table-title">Přehled tranší</h3></div>
                         <div class="table-wrapper">
-                            <table id="trancheTable"><thead><tr id="trancheTableHeader"></tr></thead><tbody id="trancheTableBody"></tbody></table>
+                            <table id="tranchesTable">
+                                <thead id="trancheTableHeader">
+                                    <tr>
+                                        <th data-column="jmeno">Název úvěru</th>
+                                        <th data-column="cislo_transe">Tranše</th>
+                                        <th data-column="rating">Rating</th>
+                                        <th data-column="vyse_transe">Výše tranše</th>
+                                        <th data-column="datum_splatnosti">Splatnost</th>
+                                        <th data-column="stav_splaceni">Stav</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tranchesTableBody"></tbody>
+                            </table>
                         </div>
                         <div class="pagination">
                             <div class="page-info" id="pageInfoTranche"></div>
@@ -962,7 +840,7 @@
                 
                 <!-- Owners Tab -->
                 <div id="owners" class="tab-content">
-                    <div class="filters-bar">
+                    <div class="filter-row">
                         <div class="filter-group">
                             <label class="filter-label">Stav splacení</label>
                             <select class="filter-select" id="filterOwnersStatus">
@@ -986,179 +864,241 @@
                         <h3 class="sub-title">📋 Kompletní přehled vlastníků</h3>
                         <div class="table-card">
                             <div class="table-wrapper">
-                                <table id="ownersTable"><thead><tr><th>Vlastník</th><th>Počet úvěrů</th><th>Celkový objem</th><th>Ø na úvěr</th></tr></thead><tbody id="ownersTableBody"></tbody></table>
+                                <table id="ownersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Vlastník</th>
+                                            <th>Počet úvěrů</th>
+                                            <th>Celkový objem</th>
+                                            <th>Ø na úvěr</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ownersTableBody"></tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
             
-            // Vykreslit jednotlivé části
             renderStats();
             renderAlerts();
-            renderOverviewCharts('');
+            renderOverviewCharts();
             populateFilters();
             applyFilters();
             applyFiltersTranche();
+            renderOwnersTab();
             setupEventListeners();
-            renderOwnersTab('');
         }
 
         function renderStats() {
             const stats = DATA.stats;
             document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-card"><div class="stat-label">Úvěrů (s datem)</div><div class="stat-value">${formatNumber(stats.total_loans_with_date)}</div><div class="stat-sub">z ${formatNumber(stats.total_loans)} celkem</div></div>
-                <div class="stat-card"><div class="stat-label">Celkem tranší</div><div class="stat-value">${formatNumber(stats.total_tranches)}</div><div class="stat-sub">všechny tranše</div></div>
-                <div class="stat-card"><div class="stat-label">Objem úvěrů</div><div class="stat-value">${(stats.total_value / 1e9).toFixed(2)}</div><div class="stat-sub">mld. Kč</div></div>
-                <div class="stat-card"><div class="stat-label">Velikost zástav</div><div class="stat-value">${(stats.total_collateral / 1e9).toFixed(2)}</div><div class="stat-sub">mld. Kč</div></div>
-                <div class="stat-card"><div class="stat-label">Průměrné LTV</div><div class="stat-value">${stats.avg_ltv.toFixed(1)}%</div><div class="stat-sub">Loan-to-Value</div></div>
-                <div class="stat-card success"><div class="stat-label">Splaceno</div><div class="stat-value success">${formatNumber(stats.splaceno_count)}</div><div class="stat-sub">${formatCurrency(stats.splaceno_value)}</div></div>
-                <div class="stat-card warning"><div class="stat-label">Nesplaceno</div><div class="stat-value warning">${formatNumber(stats.nesplaceno_count)}</div><div class="stat-sub">${formatCurrency(stats.nesplaceno_value)}</div></div>
-                <div class="stat-card danger"><div class="stat-label">Po splatnosti</div><div class="stat-value danger">${formatNumber(stats.overdue_count)}</div><div class="stat-sub">${formatCurrency(stats.overdue_value)}</div></div>
+                <div class="stat-card">
+                    <div class="stat-label">Celkem úvěrů</div>
+                    <div class="stat-value" style="color: var(--accent-blue)">${formatNumber(stats.total_loans)}</div>
+                    <div class="stat-sub">s datem: ${stats.total_loans_with_date}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Počet tranší</div>
+                    <div class="stat-value" style="color: var(--accent-purple)">${formatNumber(stats.total_tranches)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Celkový objem</div>
+                    <div class="stat-value" style="color: var(--accent-green)">${(stats.total_value / 1e9).toFixed(2)} mld.</div>
+                    <div class="stat-sub">${formatCurrency(stats.total_value)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Po splatnosti</div>
+                    <div class="stat-value" style="color: var(--accent-red)">${stats.overdue_count}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Splatnost do 30 dní</div>
+                    <div class="stat-value" style="color: var(--accent-yellow)">${stats.due_30_days}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Celkové pohledávky</div>
+                    <div class="stat-value" style="color: var(--accent-orange)">${formatCurrency(stats.total_receivables)}</div>
+                </div>
             `;
         }
 
         function renderAlerts() {
-            const alerts = DATA.insights;
-            if (alerts.length === 0) {
-                document.getElementById('alertsGrid').innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><p>Žádná upozornění</p></div>';
+            const alertsGrid = document.getElementById('alertsGrid');
+            if (DATA.insights.length === 0) {
+                alertsGrid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><p>Žádná upozornění</p></div>';
                 return;
             }
-            document.getElementById('alertsGrid').innerHTML = alerts.map((alert, idx) => `
-                <div class="alert-card ${alert.type}" id="alert-${idx}">
-                    <div class="alert-header" onclick="toggleAlert(${idx})">
-                        <div class="alert-title">
-                            <div class="alert-icon">${alert.type === 'danger' ? '🚨' : alert.type === 'warning' ? '⚠️' : 'ℹ️'}</div>
-                            <span>${alert.title}</span>
+            
+            alertsGrid.innerHTML = DATA.insights.map((insight, idx) => `
+                <div class="alert-card ${insight.type}" onclick="toggleAlert(${idx})">
+                    <div class="alert-header">
+                        <div>
+                            <div class="alert-title">${insight.title}</div>
+                            <div class="alert-value">${formatCurrency(insight.value)}</div>
                         </div>
-                        <div class="alert-stats">
-                            <span class="alert-count">${alert.count}×</span>
-                            <span class="alert-value">${formatCurrency(alert.value)}</span>
-                        </div>
-                        <div class="alert-toggle">▼</div>
+                        <div class="alert-count">${insight.count}</div>
                     </div>
-                    <div class="alert-content"><div class="alert-items">${renderAlertItems(alert)}</div></div>
+                    <div class="alert-items">
+                        ${insight.items.map(item => `
+                            <div class="alert-item">
+                                <span class="alert-item-name">${item.name}</span>
+                                <span class="alert-item-value">${item.extra || formatCurrency(item.value)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
             `).join('');
         }
 
-        function renderAlertItems(alert) {
-            return alert.items.map(item => {
-                const statusBadge = item.stav_splaceni ? `<span class="alert-item-status ${item.stav_splaceni === 'Splaceno' ? 'splaceno' : 'nesplaceno'}">${item.stav_splaceni}</span>` : '';
-                
-                if (alert.title.includes('po splatnosti')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.date} (${item.days} dní po) • ${formatCurrency(item.value)}</span></div>`;
-                } else if (alert.title.includes('Splatnost do') || alert.title.includes('30 dní') || alert.title.includes('90 dní')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.date} (za ${item.days} dní) • ${formatCurrency(item.value)}</span></div>`;
-                } else if (alert.title.includes('LTV')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">LTV ${item.ltv.toFixed(1)}% • ${formatCurrency(item.value)}</span></div>`;
-                } else if (alert.title.includes('rámec')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">+${formatCurrency(item.diff)} nad rámec • ${formatCurrency(item.uver)}</span></div>`;
-                } else if (alert.title.includes('Prodlouž')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prodlouzeni}× prodlouženo • ${formatCurrency(item.value)}</span></div>`;
-                } else {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${formatCurrency(item.value)}</span></div>`;
-                }
-            }).join('');
+        function toggleAlert(idx) {
+            const cards = document.querySelectorAll('.alert-card');
+            cards[idx].classList.toggle('expanded');
         }
 
-        function toggleAlert(idx) { document.getElementById(`alert-${idx}`).classList.toggle('expanded'); }
-
-        function renderOverviewCharts(statusFilter) {
-            let ratingStats, typeStats, ltvDist;
+        function renderOverviewCharts(statusFilter = '') {
+            let ratingStats, typeStats, ltvDist, loanValueDist;
+            
             if (statusFilter === 'splaceno') {
                 ratingStats = DATA.rating_stats_splaceno;
                 typeStats = DATA.type_stats_splaceno;
                 ltvDist = DATA.ltv_distribution_splaceno;
+                loanValueDist = DATA.loan_value_distribution_splaceno;
             } else if (statusFilter === 'nesplaceno') {
                 ratingStats = DATA.rating_stats_nesplaceno;
                 typeStats = DATA.type_stats_nesplaceno;
                 ltvDist = DATA.ltv_distribution_nesplaceno;
+                loanValueDist = DATA.loan_value_distribution_nesplaceno;
             } else {
                 ratingStats = DATA.rating_stats_all;
                 typeStats = DATA.type_stats_all;
                 ltvDist = DATA.ltv_distribution_all;
+                loanValueDist = DATA.loan_value_distribution_all;
             }
 
             Object.values(overviewCharts).forEach(c => c && c.destroy());
             overviewCharts = {};
 
+            // Generate chart grid HTML - 15 grafů podle požadavků
             document.getElementById('chartsGrid').innerHTML = `
                 <div class="chart-card"><h3 class="chart-title">📊 Rating – počet úvěrů</h3><div class="chart-container"><canvas id="ratingCountChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">💰 Rating – objem (mld. Kč)</h3><div class="chart-container"><canvas id="ratingValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📉 Rating – průměrné LTV (%)</h3><div class="chart-container"><canvas id="avgLtvChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📈 LTV – počet úvěrů</h3><div class="chart-container"><canvas id="ltvCountChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">💵 LTV – objem (mld. Kč)</h3><div class="chart-container"><canvas id="ltvValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">📊 Počet tranší na úvěr</h3><div class="chart-container"><canvas id="tranchesDistChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">🔄 Typ úvěru – počet</h3><div class="chart-container"><canvas id="typeCountChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">💰 Typ úvěru – objem (mld. Kč)</h3><div class="chart-container"><canvas id="typeValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">👥 Počet vlastníků na úvěr</h3><div class="chart-container"><canvas id="ownersDistChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">✅ Stav splacení – počet</h3><div class="chart-container"><canvas id="statusCountChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">💵 Stav splacení – objem (mld. Kč)</h3><div class="chart-container"><canvas id="statusValueChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">📊 Počet tranší na úvěr</h3><div class="chart-container"><canvas id="tranchesDistChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">📅 Splatnost nesplacených (měsíčně)</h3><div class="chart-container"><canvas id="maturityChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💳 Výše úvěru – počet úvěrů</h3><div class="chart-container"><canvas id="loanValueCountChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💰 Výše úvěru – objem (mld. Kč)</h3><div class="chart-container"><canvas id="loanValueVolumeChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">📅 Splatnost nesplacených (měsíčně) – počet</h3><div class="chart-container"><canvas id="maturityCountChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💵 Splatnost nesplacených (měsíčně) – objem (mld. Kč)</h3><div class="chart-container"><canvas id="maturityValueChart"></canvas></div></div>
             `;
 
             const ratingStatsSorted = ratingStats.sort((a, b) => a.Rating.localeCompare(b.Rating));
-            const ratingColors = ratingStatsSorted.map(r => r.Rating.startsWith('A') ? 'rgba(16, 185, 129, 0.8)' : r.Rating.startsWith('B') ? 'rgba(59, 130, 246, 0.8)' : 'rgba(245, 158, 11, 0.8)');
+            const ratingColors = ratingStatsSorted.map(r => r.Rating.startsWith('A') ? 'rgba(16, 185, 129, 0.8)' : r.Rating.startsWith('B') ? 'rgba(59, 130, 246, 0.8)' : 'rgba(139, 92, 246, 0.8)');
 
+            // 1. Rating – počet
             overviewCharts.ratingCount = new Chart(document.getElementById('ratingCountChart'), {
                 type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Počet', data: ratingStatsSorted.map(r => r['Loan ID']), backgroundColor: ratingColors, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
             });
 
+            // 2. Rating – objem
             overviewCharts.ratingValue = new Chart(document.getElementById('ratingValueChart'), {
                 type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Objem (mld. Kč)', data: ratingStatsSorted.map(r => r['Výše úvěru (Kč)'] / 1e9), backgroundColor: ratingColors, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
             });
 
+            // 3. Rating – průměrné LTV
             overviewCharts.avgLtv = new Chart(document.getElementById('avgLtvChart'), {
-                type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Průměrné LTV (%)', data: ratingStatsSorted.map(r => r.LTV_num || 0), backgroundColor: ratingColors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Ø LTV (%)', data: ratingStatsSorted.map(r => r.avgLtv), backgroundColor: ratingColors, borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
             });
 
             const ltvColors = ltvDist.map(d => d.range.includes('80') ? 'rgba(239, 68, 68, 0.8)' : d.range.includes('75') ? 'rgba(245, 158, 11, 0.8)' : 'rgba(16, 185, 129, 0.8)');
 
+            // 4. LTV – počet
             overviewCharts.ltvCount = new Chart(document.getElementById('ltvCountChart'), {
                 type: 'bar', data: { labels: ltvDist.map(d => d.range), datasets: [{ label: 'Počet', data: ltvDist.map(d => d.count), backgroundColor: ltvColors, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
             });
 
+            // 5. LTV – objem
             overviewCharts.ltvValue = new Chart(document.getElementById('ltvValueChart'), {
                 type: 'bar', data: { labels: ltvDist.map(d => d.range), datasets: [{ label: 'Objem (mld. Kč)', data: ltvDist.map(d => d.value / 1e9), backgroundColor: ltvColors, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
             });
 
-            overviewCharts.typeCount = new Chart(document.getElementById('typeCountChart'), {
-                type: 'doughnut', data: { labels: typeStats.map(t => t['Typ úvěru']), datasets: [{ data: typeStats.map(t => t['Loan ID']), backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
-            });
-
-            overviewCharts.typeValue = new Chart(document.getElementById('typeValueChart'), {
-                type: 'doughnut', data: { labels: typeStats.map(t => t['Typ úvěru']), datasets: [{ data: typeStats.map(t => t['Výše úvěru (Kč)'] / 1e9), backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
-            });
-
-            const statusStats = DATA.status_stats;
-            overviewCharts.statusCount = new Chart(document.getElementById('statusCountChart'), {
-                type: 'doughnut', data: { labels: statusStats.map(s => s['Stav splacení']), datasets: [{ data: statusStats.map(s => s['Loan ID']), backgroundColor: ['#ef4444', '#10b981'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
-            });
-
-            overviewCharts.statusValue = new Chart(document.getElementById('statusValueChart'), {
-                type: 'doughnut', data: { labels: statusStats.map(s => s['Stav splacení']), datasets: [{ data: statusStats.map(s => s['Výše úvěru (Kč)'] / 1e9), backgroundColor: ['#ef4444', '#10b981'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
-            });
-
+            // 6. Počet tranší na úvěr
             const tranchesDist = DATA.tranches_distribution;
             overviewCharts.tranchesDist = new Chart(document.getElementById('tranchesDistChart'), {
                 type: 'bar', data: { labels: tranchesDist.map(d => d.tranches + ' tranš' + (d.tranches === 1 ? 'e' : d.tranches < 5 ? 'e' : 'í')), datasets: [{ label: 'Počet úvěrů', data: tranchesDist.map(d => d.count), backgroundColor: 'rgba(139, 92, 246, 0.7)', borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
             });
 
+            // 7. Typ úvěru – počet
+            overviewCharts.typeCount = new Chart(document.getElementById('typeCountChart'), {
+                type: 'doughnut', data: { labels: typeStats.map(t => t['Typ úvěru']), datasets: [{ data: typeStats.map(t => t['Loan ID']), backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
+            });
+
+            // 8. Typ úvěru – objem
+            overviewCharts.typeValue = new Chart(document.getElementById('typeValueChart'), {
+                type: 'doughnut', data: { labels: typeStats.map(t => t['Typ úvěru']), datasets: [{ data: typeStats.map(t => t['Výše úvěru (Kč)'] / 1e9), backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
+            });
+
+            // 9. Počet vlastníků na úvěr (NOVÝ)
+            const ownersDist = DATA.owners_distribution;
+            overviewCharts.ownersDist = new Chart(document.getElementById('ownersDistChart'), {
+                type: 'bar', data: { labels: ownersDist.map(d => d.owners + ' vlastník' + (d.owners === 1 ? '' : d.owners < 5 ? 'y' : 'ů')), datasets: [{ label: 'Počet úvěrů', data: ownersDist.map(d => d.count), backgroundColor: 'rgba(6, 182, 212, 0.7)', borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+            });
+
+            // 10. Stav splacení – počet
+            const statusStats = DATA.status_stats;
+            overviewCharts.statusCount = new Chart(document.getElementById('statusCountChart'), {
+                type: 'doughnut', data: { labels: statusStats.map(s => s['Stav splacení']), datasets: [{ data: statusStats.map(s => s['Loan ID']), backgroundColor: ['#ef4444', '#10b981'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
+            });
+
+            // 11. Stav splacení – objem
+            overviewCharts.statusValue = new Chart(document.getElementById('statusValueChart'), {
+                type: 'doughnut', data: { labels: statusStats.map(s => s['Stav splacení']), datasets: [{ data: statusStats.map(s => s['Výše úvěru (Kč)'] / 1e9), backgroundColor: ['#ef4444', '#10b981'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
+            });
+
+            const loanValueColors = 'rgba(249, 115, 22, 0.7)';
+
+            // 12. Výše úvěru – počet (NOVÝ)
+            overviewCharts.loanValueCount = new Chart(document.getElementById('loanValueCountChart'), {
+                type: 'bar', data: { labels: loanValueDist.map(d => d.range), datasets: [{ label: 'Počet', data: loanValueDist.map(d => d.count), backgroundColor: loanValueColors, borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+            });
+
+            // 13. Výše úvěru – objem (NOVÝ)
+            overviewCharts.loanValueVolume = new Chart(document.getElementById('loanValueVolumeChart'), {
+                type: 'bar', data: { labels: loanValueDist.map(d => d.range), datasets: [{ label: 'Objem (mld. Kč)', data: loanValueDist.map(d => d.value / 1e9), backgroundColor: loanValueColors, borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+            });
+
+            // 14. Splatnost nesplacených – počet (NOVÝ)
             const today = new Date();
             const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             const maturityData = DATA.monthly.filter(m => m.month >= currentMonth);
-            overviewCharts.maturity = new Chart(document.getElementById('maturityChart'), {
-                type: 'line', data: { labels: maturityData.map(m => m.month), datasets: [{ label: 'Objem (mil. Kč)', data: maturityData.map(m => m['Výše úvěru (Kč)'] / 1e6), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
+            
+            overviewCharts.maturityCount = new Chart(document.getElementById('maturityCountChart'), {
+                type: 'line', data: { labels: maturityData.map(m => m.month), datasets: [{ label: 'Počet', data: maturityData.map(m => m['Loan ID']), borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } } } }
+            });
+
+            // 15. Splatnost nesplacených – objem
+            overviewCharts.maturityValue = new Chart(document.getElementById('maturityValueChart'), {
+                type: 'line', data: { labels: maturityData.map(m => m.month), datasets: [{ label: 'Objem (mld. Kč)', data: maturityData.map(m => m['Výše úvěru (Kč)'] / 1e9), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } } } }
             });
         }
@@ -1185,22 +1125,19 @@
 
             filteredData = DATA.loans.filter(item => {
                 if (search && !item.jmeno.toLowerCase().includes(search) && !(item.vlastnik || '').toLowerCase().includes(search)) return false;
-                if (type && item.typ !== type) return false;
+                if (type && item.typ_uveru !== type) return false;
                 if (rating && item.rating !== rating) return false;
                 if (status && item.stav_splaceni !== status) return false;
                 if (ltv) {
-                    if (ltv === 'low' && (item.ltv_uveru === null || item.ltv_uveru > 60)) return false;
-                    if (ltv === 'medium' && (item.ltv_uveru === null || item.ltv_uveru <= 60 || item.ltv_uveru > 75)) return false;
-                    if (ltv === 'high' && (item.ltv_uveru === null || item.ltv_uveru <= 75)) return false;
+                    const ltvVal = item.ltv || 0;
+                    if (ltv === '0-50' && ltvVal >= 50) return false;
+                    if (ltv === '50-75' && (ltvVal < 50 || ltvVal >= 75)) return false;
+                    if (ltv === '75+' && ltvVal < 75) return false;
                 }
                 if (problems) {
-                    if (problems === 'overdue' && (item.days_to_maturity === null || item.days_to_maturity >= 0 || item.stav_splaceni === 'Splaceno')) return false;
-                    if (problems === 'soon30' && (item.days_to_maturity === null || item.days_to_maturity < 0 || item.days_to_maturity > 30 || item.stav_splaceni === 'Splaceno')) return false;
-                    if (problems === 'soon90' && (item.days_to_maturity === null || item.days_to_maturity < 0 || item.days_to_maturity > 90 || item.stav_splaceni === 'Splaceno')) return false;
-                    if (problems === 'highltv' && (item.ltv_uveru === null || item.ltv_uveru <= 75)) return false;
-                    if (problems === 'overframe' && !item.uver_nad_ramec) return false;
-                    if (problems === 'prolonged' && !item.prodlouzeni) return false;
-                    if (problems === 'nodate' && item.datum_parsed_valid) return false;
+                    if (problems === 'overdue' && !(item.days_to_maturity < 0 && item.stav_splaceni !== 'Splaceno')) return false;
+                    if (problems === 'highltv' && !(item.ltv > 75)) return false;
+                    if (problems === 'extended' && !(item.prodlouzeni === true || item.prodlouzeni === 'Ano')) return false;
                 }
                 return true;
             });
@@ -1208,67 +1145,47 @@
             if (sortColumn) {
                 filteredData.sort((a, b) => {
                     let aVal = a[sortColumn], bVal = b[sortColumn];
-                    if (sortColumn === 'datum_splatnosti') { aVal = a.datum_timestamp; bVal = b.datum_timestamp; }
-                    if (aVal === null || aVal === undefined) aVal = sortDirection === 'asc' ? Infinity : -Infinity;
-                    if (bVal === null || bVal === undefined) bVal = sortDirection === 'asc' ? Infinity : -Infinity;
-                    if (typeof aVal === 'string') return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                    return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+                    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+                    if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
                 });
             }
+
             currentPage = 1;
             renderTable();
-            document.getElementById('resultsCount').innerHTML = `Zobrazeno <strong>${filteredData.length}</strong> z ${DATA.loans.length}`;
         }
 
         function renderTable() {
-            const start = (currentPage - 1) * pageSize, end = start + pageSize, pageData = filteredData.slice(start, end);
-            const headers = ['Název úvěru', 'Vlastník', 'Typ', 'Tranší', 'Rating', 'LTV', 'Splatnost', 'Výše úvěru', 'Zástava', 'Stav', 'Problémy'];
-            const headerColumns = ['jmeno', 'vlastnik', 'typ', 'tranches_count', 'rating', 'ltv_uveru', 'datum_splatnosti', 'vyse_uveru', 'velikost_zastavy', 'stav_splaceni', ''];
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredData.slice(start, end);
 
-            document.getElementById('tableHeader').innerHTML = headers.map((h, i) => {
-                const col = headerColumns[i];
-                return `<th class="${sortColumn === col ? (sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc') : ''}" data-column="${col}">${h}</th>`;
+            document.getElementById('loansTableBody').innerHTML = pageData.map(loan => {
+                const isOverdue = loan.days_to_maturity < 0 && loan.stav_splaceni !== 'Splaceno';
+                const statusClass = loan.stav_splaceni === 'Splaceno' ? 'success' : isOverdue ? 'danger' : 'info';
+                return `<tr>
+                    <td>${loan.jmeno || ''}</td>
+                    <td>${loan.typ_uveru || ''}</td>
+                    <td><span class="badge ${loan.rating?.startsWith('A') ? 'success' : loan.rating?.startsWith('B') ? 'info' : 'warning'}">${loan.rating || ''}</span></td>
+                    <td class="currency">${formatCurrency(loan.vyse_uveru)}</td>
+                    <td>${formatPercent(loan.ltv)}</td>
+                    <td>${formatDate(loan.datum_splatnosti)}</td>
+                    <td><span class="badge ${statusClass}">${loan.stav_splaceni || ''}</span></td>
+                    <td>${loan.vlastnik || ''}</td>
+                </tr>`;
             }).join('');
 
-            if (pageData.length === 0) {
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" class="empty-state">Žádné záznamy</td></tr>';
-            } else {
-                document.getElementById('tableBody').innerHTML = pageData.map(item => {
-                    const problems = [];
-                    if (!item.datum_parsed_valid) problems.push(`<span class="badge badge-info">Bez data</span>`);
-                    else if (item.days_to_maturity !== null && item.days_to_maturity < 0 && item.stav_splaceni !== 'Splaceno') problems.push(`<span class="badge badge-warning">Po splatnosti ${Math.abs(item.days_to_maturity)}d</span>`);
-                    else if (item.days_to_maturity !== null && item.days_to_maturity <= 30 && item.days_to_maturity >= 0 && item.stav_splaceni !== 'Splaceno') problems.push(`<span class="badge badge-caution">Brzy ${item.days_to_maturity}d</span>`);
-                    if (item.ltv_uveru > 75) problems.push(`<span class="badge badge-warning">LTV ${item.ltv_uveru.toFixed(0)}%</span>`);
-                    if (item.uver_nad_ramec) problems.push(`<span class="badge badge-warning">Nad rámec</span>`);
-                    if (item.prodlouzeni) problems.push(`<span class="badge badge-info">Prodl. ${item.prodlouzeni}×</span>`);
-
-                    const ratingClass = (item.rating || '').startsWith('A') ? 'a' : (item.rating || '').startsWith('B') ? 'b' : 'c';
-                    const statusClass = item.stav_splaceni === 'Splaceno' ? 'splaceno' : 'nesplaceno';
-                    const ltv = item.ltv_uveru;
-                    const ltvClass = ltv > 75 ? 'high' : ltv > 65 ? 'medium' : '';
-                    const ltvBar = ltv !== null ? `<span class="ltv-bar"><span class="ltv-fill ${ltvClass}" style="width: ${Math.min(ltv, 100)}%"></span></span>` : '';
-
-                    return `<tr>
-                        <td class="cell-name" title="${item.jmeno}">${item.jmeno}</td>
-                        <td class="cell-owner" title="${item.vlastnik || ''}">${item.vlastnik || '-'}</td>
-                        <td><span class="badge badge-type">${item.typ || '-'}</span></td>
-                        <td class="cell-number">${item.tranches_count || 1}</td>
-                        <td><span class="badge badge-rating ${ratingClass}">${item.rating || '-'}</span></td>
-                        <td class="cell-number">${formatPercent(ltv)} ${ltvBar}</td>
-                        <td>${item.datum_splatnosti || '-'}</td>
-                        <td class="cell-number">${formatCurrency(item.vyse_uveru)}</td>
-                        <td class="cell-number">${formatCurrency(item.velikost_zastavy)}</td>
-                        <td><span class="badge badge-status ${statusClass}">${item.stav_splaceni || '-'}</span></td>
-                        <td>${problems.join(' ') || '-'}</td>
-                    </tr>`;
-                }).join('');
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            document.getElementById('pageInfo').textContent = `Zobrazeno ${start + 1}-${Math.min(end, filteredData.length)} z ${filteredData.length}`;
+            
+            let buttons = '';
+            if (currentPage > 1) buttons += `<button class="page-btn" onclick="goToPage(${currentPage - 1})">←</button>`;
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                buttons += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
             }
-
-            const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
-            document.getElementById('pageInfo').textContent = `Stránka ${currentPage} z ${totalPages} (${filteredData.length} záznamů)`;
-            let buttons = `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(1)">«</button><button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">‹</button>`;
-            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) buttons += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
-            buttons += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">›</button><button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${totalPages})">»</button>`;
+            if (currentPage < totalPages) buttons += `<button class="page-btn" onclick="goToPage(${currentPage + 1})">→</button>`;
             document.getElementById('pageButtons').innerHTML = buttons;
         }
 
@@ -1278,97 +1195,102 @@
             const search = document.getElementById('searchInputTranche').value.toLowerCase();
             const rating = document.getElementById('filterRatingTranche').value;
             const status = document.getElementById('filterStatusTranche').value;
-            const ltv = document.getElementById('filterLTVTranche').value;
 
             filteredTranches = DATA.tranches.filter(item => {
-                if (item.typ !== 'Tranšový') return false;
                 if (search && !item.jmeno.toLowerCase().includes(search)) return false;
                 if (rating && item.rating !== rating) return false;
                 if (status && item.stav_splaceni !== status) return false;
-                if (ltv) {
-                    if (ltv === 'low' && (item.ltv_transe === null || item.ltv_transe > 60)) return false;
-                    if (ltv === 'medium' && (item.ltv_transe === null || item.ltv_transe <= 60 || item.ltv_transe > 75)) return false;
-                    if (ltv === 'high' && (item.ltv_transe === null || item.ltv_transe <= 75)) return false;
-                }
                 return true;
             });
 
             if (sortColumnTranche) {
                 filteredTranches.sort((a, b) => {
                     let aVal = a[sortColumnTranche], bVal = b[sortColumnTranche];
-                    if (sortColumnTranche === 'datum_splatnosti') { aVal = a.datum_timestamp; bVal = b.datum_timestamp; }
-                    if (aVal === null || aVal === undefined) aVal = sortDirectionTranche === 'asc' ? Infinity : -Infinity;
-                    if (bVal === null || bVal === undefined) bVal = sortDirectionTranche === 'asc' ? Infinity : -Infinity;
-                    if (typeof aVal === 'string') return sortDirectionTranche === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                    return sortDirectionTranche === 'asc' ? aVal - bVal : bVal - aVal;
+                    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+                    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+                    if (aVal < bVal) return sortDirectionTranche === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return sortDirectionTranche === 'asc' ? 1 : -1;
+                    return 0;
                 });
             }
+
             currentPageTranche = 1;
             renderTranchesTable();
         }
 
         function renderTranchesTable() {
-            const start = (currentPageTranche - 1) * pageSize, end = start + pageSize, pageData = filteredTranches.slice(start, end);
-            const headers = ['Název úvěru', 'Tranše', 'Rating', 'LTV tranše', 'Splatnost', 'Výše tranše', 'Výše úvěru', 'Stav'];
-            const headerColumns = ['jmeno', 'cislo_transe', 'rating', 'ltv_transe', 'datum_splatnosti', 'vyse_transe', 'vyse_uveru', 'stav_splaceni'];
+            const start = (currentPageTranche - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = filteredTranches.slice(start, end);
 
-            document.getElementById('trancheTableHeader').innerHTML = headers.map((h, i) => {
-                const col = headerColumns[i];
-                return `<th class="${sortColumnTranche === col ? (sortDirectionTranche === 'asc' ? 'sorted-asc' : 'sorted-desc') : ''}" data-column="${col}">${h}</th>`;
+            document.getElementById('tranchesTableBody').innerHTML = pageData.map(tr => {
+                const statusClass = tr.stav_splaceni === 'Splaceno' ? 'success' : 'info';
+                return `<tr>
+                    <td>${tr.jmeno || ''}</td>
+                    <td>${tr.cislo_transe || ''}</td>
+                    <td><span class="badge ${tr.rating?.startsWith('A') ? 'success' : tr.rating?.startsWith('B') ? 'info' : 'warning'}">${tr.rating || ''}</span></td>
+                    <td class="currency">${formatCurrency(tr.vyse_transe)}</td>
+                    <td>${formatDate(tr.datum_splatnosti)}</td>
+                    <td><span class="badge ${statusClass}">${tr.stav_splaceni || ''}</span></td>
+                </tr>`;
             }).join('');
 
-            if (pageData.length === 0) {
-                document.getElementById('trancheTableBody').innerHTML = '<tr><td colspan="8" class="empty-state">Žádné tranše</td></tr>';
-            } else {
-                document.getElementById('trancheTableBody').innerHTML = pageData.map(item => {
-                    const ratingClass = (item.rating || '').startsWith('A') ? 'a' : (item.rating || '').startsWith('B') ? 'b' : 'c';
-                    const statusClass = item.stav_splaceni === 'Splaceno' ? 'splaceno' : 'nesplaceno';
-                    const ltv = item.ltv_transe;
-                    const ltvClass = ltv > 75 ? 'high' : ltv > 65 ? 'medium' : '';
-                    const ltvBar = ltv !== null ? `<span class="ltv-bar"><span class="ltv-fill ${ltvClass}" style="width: ${Math.min(ltv, 100)}%"></span></span>` : '';
-                    return `<tr>
-                        <td class="cell-name" title="${item.jmeno}">${item.jmeno}</td>
-                        <td class="cell-number">${item.cislo_transe || '-'}</td>
-                        <td><span class="badge badge-rating ${ratingClass}">${item.rating || '-'}</span></td>
-                        <td class="cell-number">${formatPercent(ltv)} ${ltvBar}</td>
-                        <td>${item.datum_splatnosti || '-'}</td>
-                        <td class="cell-number">${formatCurrency(item.vyse_transe)}</td>
-                        <td class="cell-number">${formatCurrency(item.vyse_uveru)}</td>
-                        <td><span class="badge badge-status ${statusClass}">${item.stav_splaceni || '-'}</span></td>
-                    </tr>`;
-                }).join('');
+            const totalPages = Math.ceil(filteredTranches.length / pageSize);
+            document.getElementById('pageInfoTranche').textContent = `Zobrazeno ${start + 1}-${Math.min(end, filteredTranches.length)} z ${filteredTranches.length}`;
+            
+            let buttons = '';
+            if (currentPageTranche > 1) buttons += `<button class="page-btn" onclick="goToPageTranche(${currentPageTranche - 1})">←</button>`;
+            for (let i = Math.max(1, currentPageTranche - 2); i <= Math.min(totalPages, currentPageTranche + 2); i++) {
+                buttons += `<button class="page-btn ${i === currentPageTranche ? 'active' : ''}" onclick="goToPageTranche(${i})">${i}</button>`;
             }
-
-            const totalPages = Math.ceil(filteredTranches.length / pageSize) || 1;
-            document.getElementById('pageInfoTranche').textContent = `Stránka ${currentPageTranche} z ${totalPages} (${filteredTranches.length} tranší)`;
-            document.getElementById('resultsCountTranche').innerHTML = `Zobrazeno <strong>${filteredTranches.length}</strong> tranší`;
-            let buttons = `<button class="page-btn" ${currentPageTranche === 1 ? 'disabled' : ''} onclick="goToPageTranche(1)">«</button><button class="page-btn" ${currentPageTranche === 1 ? 'disabled' : ''} onclick="goToPageTranche(${currentPageTranche - 1})">‹</button>`;
-            for (let i = Math.max(1, currentPageTranche - 2); i <= Math.min(totalPages, currentPageTranche + 2); i++) buttons += `<button class="page-btn ${i === currentPageTranche ? 'active' : ''}" onclick="goToPageTranche(${i})">${i}</button>`;
-            buttons += `<button class="page-btn" ${currentPageTranche === totalPages ? 'disabled' : ''} onclick="goToPageTranche(${currentPageTranche + 1})">›</button><button class="page-btn" ${currentPageTranche === totalPages ? 'disabled' : ''} onclick="goToPageTranche(${totalPages})">»</button>`;
+            if (currentPageTranche < totalPages) buttons += `<button class="page-btn" onclick="goToPageTranche(${currentPageTranche + 1})">→</button>`;
             document.getElementById('pageButtonsTranche').innerHTML = buttons;
         }
 
         function goToPageTranche(page) { currentPageTranche = page; renderTranchesTable(); }
 
-        function renderOwnersTab(statusFilter) {
-            let ownerData = statusFilter === 'splaceno' ? DATA.owner_stats_splaceno : statusFilter === 'nesplaceno' ? DATA.owner_stats_nesplaceno : DATA.owner_stats_all;
-            const topByValue = ownerData.slice(0, 20);
-            const topByCount = [...ownerData].sort((a, b) => b.count - a.count).slice(0, 20);
+        function renderOwnersTab(statusFilter = '') {
+            let ownerStats;
+            if (statusFilter === 'splaceno') {
+                ownerStats = DATA.owner_stats_splaceno;
+            } else if (statusFilter === 'nesplaceno') {
+                ownerStats = DATA.owner_stats_nesplaceno;
+            } else {
+                ownerStats = DATA.owner_stats;
+            }
 
             if (ownersValueChart) ownersValueChart.destroy();
             if (ownersCountChart) ownersCountChart.destroy();
 
+            const top20 = ownerStats.slice(0, 20);
+
             ownersValueChart = new Chart(document.getElementById('ownersValueChart'), {
-                type: 'bar', data: { labels: topByValue.map(o => o.vlastnik.length > 35 ? o.vlastnik.slice(0, 35) + '...' : o.vlastnik), datasets: [{ label: 'Objem (mil. Kč)', data: topByValue.map(o => o.value / 1e6), backgroundColor: 'rgba(59, 130, 246, 0.7)', borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, y: { grid: { display: false }, ticks: { color: '#8888a0', font: { size: 10 } } } } }
+                type: 'bar',
+                data: {
+                    labels: top20.map(o => o.owner.length > 25 ? o.owner.substring(0, 25) + '...' : o.owner),
+                    datasets: [{ label: 'Objem (mld. Kč)', data: top20.map(o => o.value / 1e9), backgroundColor: 'rgba(59, 130, 246, 0.7)', borderRadius: 6 }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, y: { grid: { display: false }, ticks: { color: '#8888a0', font: { size: 11 } } } } }
             });
 
+            const top20ByCount = [...ownerStats].sort((a, b) => b.count - a.count).slice(0, 20);
             ownersCountChart = new Chart(document.getElementById('ownersCountChart'), {
-                type: 'bar', data: { labels: topByCount.map(o => o.vlastnik.length > 35 ? o.vlastnik.slice(0, 35) + '...' : o.vlastnik), datasets: [{ label: 'Počet úvěrů', data: topByCount.map(o => o.count), backgroundColor: 'rgba(139, 92, 246, 0.7)', borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, y: { grid: { display: false }, ticks: { color: '#8888a0', font: { size: 10 } } } } }
+                type: 'bar',
+                data: {
+                    labels: top20ByCount.map(o => o.owner.length > 25 ? o.owner.substring(0, 25) + '...' : o.owner),
+                    datasets: [{ label: 'Počet úvěrů', data: top20ByCount.map(o => o.count), backgroundColor: 'rgba(139, 92, 246, 0.7)', borderRadius: 6 }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, y: { grid: { display: false }, ticks: { color: '#8888a0', font: { size: 11 } } } } }
             });
 
-            document.getElementById('ownersTableBody').innerHTML = ownerData.map(o => `<tr><td class="cell-name">${o.vlastnik}</td><td class="cell-number">${o.count}</td><td class="cell-number">${formatCurrency(o.value)}</td><td class="cell-number">${formatCurrency(o.value / o.count)}</td></tr>`).join('');
+            document.getElementById('ownersTableBody').innerHTML = ownerStats.map(o => `
+                <tr>
+                    <td>${o.owner}</td>
+                    <td>${o.count}</td>
+                    <td class="currency">${formatCurrency(o.value)}</td>
+                    <td class="currency">${formatCurrency(o.value / o.count)}</td>
+                </tr>
+            `).join('');
         }
 
         function setupEventListeners() {
@@ -1392,7 +1314,7 @@
                 applyFilters();
             });
 
-            document.getElementById('tableHeader').addEventListener('click', (e) => {
+            document.getElementById('loansTableHeader').addEventListener('click', (e) => {
                 const th = e.target.closest('th');
                 if (!th || !th.dataset.column) return;
                 if (sortColumn === th.dataset.column) sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
@@ -1400,13 +1322,13 @@
                 applyFilters();
             });
 
-            ['searchInputTranche', 'filterRatingTranche', 'filterStatusTranche', 'filterLTVTranche'].forEach(id => {
+            ['searchInputTranche', 'filterRatingTranche', 'filterStatusTranche'].forEach(id => {
                 document.getElementById(id).addEventListener('input', applyFiltersTranche);
                 document.getElementById(id).addEventListener('change', applyFiltersTranche);
             });
 
             document.getElementById('resetFiltersTranche').addEventListener('click', () => {
-                ['searchInputTranche', 'filterRatingTranche', 'filterStatusTranche', 'filterLTVTranche'].forEach(id => document.getElementById(id).value = '');
+                ['searchInputTranche', 'filterRatingTranche', 'filterStatusTranche'].forEach(id => document.getElementById(id).value = '');
                 sortColumnTranche = null; sortDirectionTranche = 'asc';
                 applyFiltersTranche();
             });
@@ -1423,10 +1345,8 @@
             document.getElementById('filterOverviewStatus').addEventListener('change', (e) => renderOverviewCharts(e.target.value));
         }
 
-        // =============================================================================
-        // START
-        // =============================================================================
-        document.addEventListener('DOMContentLoaded', loadData);
+        // Start
+        loadData();
     </script>
 </body>
 </html>
