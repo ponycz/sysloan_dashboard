@@ -468,7 +468,8 @@
                     ltv_uveru: ltvUveru,
                     ltv_transe: ltvTranse,
                     velikost_zastavy: loan.zastava || 0,
-                    uver_nad_ramec: loan.vyse_uveru > loan.vyse_ramec && loan.vyse_ramec > 0
+                    uver_nad_ramec: loan.vyse_uveru > loan.vyse_ramec && loan.vyse_ramec > 0,
+                    preplatek: loan.advancesBalance || 0
                 };
             });
             
@@ -740,6 +741,23 @@
                 });
             }
             
+            // Splacené úvěry s přeplatkem > 0 Kč
+            const withPreplatek = loans.filter(l => l.stav_splaceni === 'Splaceno' && l.preplatek && l.preplatek > 0);
+            if (withPreplatek.length > 0) {
+                insights.push({
+                    type: 'info',
+                    title: 'ℹ️ Splacené úvěry s přeplatkem > 0 Kč',
+                    count: withPreplatek.length,
+                    value: withPreplatek.reduce((sum, l) => sum + (l.preplatek || 0), 0),
+                    items: withPreplatek.sort((a, b) => (b.preplatek || 0) - (a.preplatek || 0)).slice(0, 20).map(l => ({
+                        name: l.jmeno,
+                        preplatek: l.preplatek,
+                        value: l.vyse_uveru,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+            
             return insights;
         }
 
@@ -989,6 +1007,7 @@
                                 <option value="overframe">Překročený rámec</option>
                                 <option value="prolonged">Prodlouženo</option>
                                 <option value="nodate">Bez data splatnosti</option>
+                                <option value="preplatek">Přeplatek > 0 Kč</option>
                             </select>
                         </div>
                         <div class="filter-spacer"></div>
@@ -1145,6 +1164,8 @@
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prodlouzeni}× prodlouženo • ${formatCurrency(item.value)}</span></div>`;
                 } else if (alert.title.includes('pohledávkou')) {
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Pohledávka: ${formatCurrency(item.pohledavka)} • Úvěr: ${formatCurrency(item.value)}</span></div>`;
+                } else if (alert.title.includes('přeplatkem')) {
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Přeplatek: ${formatCurrency(item.preplatek)} • Úvěr: ${formatCurrency(item.value)}</span></div>`;
                 } else {
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${formatCurrency(item.value)}</span></div>`;
                 }
@@ -1344,6 +1365,7 @@
                     if (problems === 'overframe' && !item.uver_nad_ramec) return false;
                     if (problems === 'prolonged' && !item.prodlouzeni) return false;
                     if (problems === 'nodate' && item.datum_parsed_valid) return false;
+                    if (problems === 'preplatek' && (!item.preplatek || item.preplatek <= 0)) return false;
                 }
                 return true;
             });
@@ -1365,8 +1387,8 @@
 
         function renderTable() {
             const start = (currentPage - 1) * pageSize, end = start + pageSize, pageData = filteredData.slice(start, end);
-            const headers = ['Název úvěru', 'Vlastník', 'Typ', 'Tranší', 'Rating', 'LTV', 'Splatnost', 'Výše úvěru', 'Zástava', 'Stav', 'Problémy'];
-            const headerColumns = ['jmeno', 'vlastnik', 'typ', 'tranches_count', 'rating', 'ltv_uveru', 'datum_splatnosti', 'vyse_uveru', 'velikost_zastavy', 'stav_splaceni', ''];
+            const headers = ['Název úvěru', 'Vlastník', 'Typ', 'Tranší', 'Rating', 'LTV', 'Splatnost', 'Výše úvěru', 'Zástava', 'Přeplatek', 'Stav', 'Problémy'];
+            const headerColumns = ['jmeno', 'vlastnik', 'typ', 'tranches_count', 'rating', 'ltv_uveru', 'datum_splatnosti', 'vyse_uveru', 'velikost_zastavy', 'preplatek', 'stav_splaceni', ''];
 
             document.getElementById('tableHeader').innerHTML = headers.map((h, i) => {
                 const col = headerColumns[i];
@@ -1374,7 +1396,7 @@
             }).join('');
 
             if (pageData.length === 0) {
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" class="empty-state">Žádné záznamy</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="12" class="empty-state">Žádné záznamy</td></tr>';
             } else {
                 document.getElementById('tableBody').innerHTML = pageData.map(item => {
                     const problems = [];
@@ -1401,6 +1423,7 @@
                         <td>${item.datum_splatnosti || '-'}</td>
                         <td class="cell-number">${formatCurrency(item.vyse_uveru)}</td>
                         <td class="cell-number">${formatCurrency(item.velikost_zastavy)}</td>
+                        <td class="cell-number">${item.preplatek ? formatCurrency(item.preplatek) : '-'}</td>
                         <td><span class="badge badge-status ${statusClass}">${item.stav_splaceni || '-'}</span></td>
                         <td>${problems.join(' ') || '-'}</td>
                     </tr>`;
