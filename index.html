@@ -28,6 +28,43 @@
             --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
         }
 
+        /* Světlý motiv */
+        body.light-mode {
+            --bg-dark: #f5f5f7;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0f0f5;
+            --border: #e0e0e8;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555570;
+            --text-muted: #8888a0;
+        }
+
+        body.light-mode .noise-overlay { opacity: 0.015; }
+        body.light-mode .logo-icon { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2); }
+        body.light-mode .stat-card:hover { box-shadow: 0 10px 40px rgba(59, 130, 246, 0.1); }
+        body.light-mode .table-wrapper { box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        body.light-mode .chart-card { box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+        /* Přepínač motivu */
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+        .theme-toggle .icon { font-size: 1.1rem; }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -357,6 +394,10 @@
             </div>
             <div class="header-right">
                 <div class="data-note">⚠️ Statistiky bez <span id="missingDateCount">0</span> úvěrů bez data splatnosti</div>
+                <button class="theme-toggle" id="themeToggle" title="Přepnout motiv">
+                    <span class="icon" id="themeIcon">🌙</span>
+                    <span id="themeText">Tmavý</span>
+                </button>
                 <div class="date-badge" id="dateBadge">📅 Načítání...</div>
             </div>
         </header>
@@ -383,6 +424,42 @@
         let currentPageTranche = 1, sortColumnTranche = null, sortDirectionTranche = 'asc', filteredTranches = [];
         let ownersValueChart = null, ownersCountChart = null;
         let overviewCharts = {};
+
+        // =============================================================================
+        // PŘEPÍNAČ MOTIVU
+        // =============================================================================
+        function initTheme() {
+            const savedTheme = localStorage.getItem('sysloan-theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                updateThemeButton(true);
+            }
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light-mode');
+            localStorage.setItem('sysloan-theme', isLight ? 'light' : 'dark');
+            updateThemeButton(isLight);
+            
+            // Překreslit grafy s novými barvami
+            if (DATA) {
+                const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+                renderOverviewCharts(statusFilter);
+                updateOwnersChart();
+            }
+        }
+
+        function updateThemeButton(isLight) {
+            const icon = document.getElementById('themeIcon');
+            const text = document.getElementById('themeText');
+            if (icon && text) {
+                icon.textContent = isLight ? '☀️' : '🌙';
+                text.textContent = isLight ? 'Světlý' : 'Tmavý';
+            }
+        }
+
+        // Inicializace motivu při načtení
+        initTheme();
 
         // =============================================================================
         // POMOCNÉ FUNKCE
@@ -1174,7 +1251,18 @@
 
         function toggleAlert(idx) { document.getElementById(`alert-${idx}`).classList.toggle('expanded'); }
 
+        // Barvy pro grafy podle motivu
+        function getChartColors() {
+            const isLight = document.body.classList.contains('light-mode');
+            return {
+                gridColor: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.05)',
+                tickColor: isLight ? '#555570' : '#8888a0',
+                textColor: isLight ? '#1a1a2e' : '#f0f0f5'
+            };
+        }
+
         function renderOverviewCharts(statusFilter) {
+            const chartColors = getChartColors();
             let ratingStats, typeStats, ltvDist, loanSizeDist;
             if (statusFilter === 'splaceno') {
                 ratingStats = DATA.rating_stats_splaceno;
@@ -1225,19 +1313,19 @@
 
             overviewCharts.ratingCount = new Chart(document.getElementById('ratingCountChart'), {
                 type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Počet', data: ratingStatsSorted.map(r => r['Loan ID']), backgroundColor: ratingColors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 2. Rating – objem
             overviewCharts.ratingValue = new Chart(document.getElementById('ratingValueChart'), {
                 type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Objem (mld. Kč)', data: ratingStatsSorted.map(r => r['Výše úvěru (Kč)'] / 1e9), backgroundColor: ratingColors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 3. Rating – průměrné LTV
             overviewCharts.avgLtv = new Chart(document.getElementById('avgLtvChart'), {
                 type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Průměrné LTV (%)', data: ratingStatsSorted.map(r => r.LTV_num || 0), backgroundColor: ratingColors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 4. LTV – počet
@@ -1245,20 +1333,20 @@
 
             overviewCharts.ltvCount = new Chart(document.getElementById('ltvCountChart'), {
                 type: 'bar', data: { labels: ltvDist.map(d => d.range), datasets: [{ label: 'Počet', data: ltvDist.map(d => d.count), backgroundColor: ltvColors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 5. LTV – objem
             overviewCharts.ltvValue = new Chart(document.getElementById('ltvValueChart'), {
                 type: 'bar', data: { labels: ltvDist.map(d => d.range), datasets: [{ label: 'Objem (mld. Kč)', data: ltvDist.map(d => d.value / 1e9), backgroundColor: ltvColors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 6. Počet tranší na úvěr
             const tranchesDist = DATA.tranches_distribution;
             overviewCharts.tranchesDist = new Chart(document.getElementById('tranchesDistChart'), {
                 type: 'bar', data: { labels: tranchesDist.map(d => d.tranches + ' tranš' + (d.tranches === 1 ? 'e' : d.tranches < 5 ? 'e' : 'í')), datasets: [{ label: 'Počet úvěrů', data: tranchesDist.map(d => d.count), backgroundColor: 'rgba(139, 92, 246, 0.7)', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 7. Typ úvěru – počet
@@ -1277,7 +1365,7 @@
             const ownersPerLoanDist = DATA.owners_per_loan_distribution;
             overviewCharts.ownersPerLoan = new Chart(document.getElementById('ownersPerLoanChart'), {
                 type: 'bar', data: { labels: ownersPerLoanDist.map(d => d.owners + ' vlastník' + (d.owners === 1 ? '' : d.owners < 5 ? 'y' : 'ů')), datasets: [{ label: 'Počet úvěrů', data: ownersPerLoanDist.map(d => d.count), backgroundColor: 'rgba(6, 182, 212, 0.7)', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 10. Stav splacení – počet
@@ -1301,13 +1389,13 @@
 
             overviewCharts.loanSizeCount = new Chart(document.getElementById('loanSizeCountChart'), {
                 type: 'bar', data: { labels: loanSizeDist.map(d => d.range), datasets: [{ label: 'Počet', data: loanSizeDist.map(d => d.count), backgroundColor: loanSizeColors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 13. Výše úvěru – objem
             overviewCharts.loanSizeValue = new Chart(document.getElementById('loanSizeValueChart'), {
                 type: 'bar', data: { labels: loanSizeDist.map(d => d.range), datasets: [{ label: 'Objem (mld. Kč)', data: loanSizeDist.map(d => d.value / 1e9), backgroundColor: loanSizeColors, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
             // 14. Splatnost nesplacených – počet
@@ -1317,13 +1405,13 @@
             
             overviewCharts.maturityCount = new Chart(document.getElementById('maturityCountChart'), {
                 type: 'line', data: { labels: maturityData.map(m => m.month), datasets: [{ label: 'Počet úvěrů', data: maturityData.map(m => m['Loan ID']), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } } } }
             });
 
             // 15. Splatnost nesplacených – objem
             overviewCharts.maturityValue = new Chart(document.getElementById('maturityValueChart'), {
                 type: 'line', data: { labels: maturityData.map(m => m.month), datasets: [{ label: 'Objem (mld. Kč)', data: maturityData.map(m => m['Výše úvěru (Kč)'] / 1e9), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } } } }
             });
         }
 
@@ -1520,18 +1608,19 @@
             let ownerData = statusFilter === 'splaceno' ? DATA.owner_stats_splaceno : statusFilter === 'nesplaceno' ? DATA.owner_stats_nesplaceno : DATA.owner_stats_all;
             const topByValue = ownerData.slice(0, 20);
             const topByCount = [...ownerData].sort((a, b) => b.count - a.count).slice(0, 20);
+            const chartColors = getChartColors();
 
             if (ownersValueChart) ownersValueChart.destroy();
             if (ownersCountChart) ownersCountChart.destroy();
 
             ownersValueChart = new Chart(document.getElementById('ownersValueChart'), {
                 type: 'bar', data: { labels: topByValue.map(o => o.vlastnik.length > 35 ? o.vlastnik.slice(0, 35) + '...' : o.vlastnik), datasets: [{ label: 'Objem (mil. Kč)', data: topByValue.map(o => o.value / 1e6), backgroundColor: 'rgba(59, 130, 246, 0.7)', borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, y: { grid: { display: false }, ticks: { color: '#8888a0', font: { size: 10 } } } } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, y: { grid: { display: false }, ticks: { color: chartColors.tickColor, font: { size: 10 } } } } }
             });
 
             ownersCountChart = new Chart(document.getElementById('ownersCountChart'), {
                 type: 'bar', data: { labels: topByCount.map(o => o.vlastnik.length > 35 ? o.vlastnik.slice(0, 35) + '...' : o.vlastnik), datasets: [{ label: 'Počet úvěrů', data: topByCount.map(o => o.count), backgroundColor: 'rgba(139, 92, 246, 0.7)', borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8888a0' } }, y: { grid: { display: false }, ticks: { color: '#8888a0', font: { size: 10 } } } } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, y: { grid: { display: false }, ticks: { color: chartColors.tickColor, font: { size: 10 } } } } }
             });
 
             document.getElementById('ownersTableBody').innerHTML = ownerData.map(o => `<tr><td class="cell-name">${o.vlastnik}</td><td class="cell-number">${o.count}</td><td class="cell-number">${formatCurrency(o.value)}</td><td class="cell-number">${formatCurrency(o.value / o.count)}</td></tr>`).join('');
@@ -1587,6 +1676,9 @@
 
             document.getElementById('filterOwnersStatus').addEventListener('change', (e) => renderOwnersTab(e.target.value));
             document.getElementById('filterOverviewStatus').addEventListener('change', (e) => renderOverviewCharts(e.target.value));
+            
+            // Přepínač motivu
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
         }
 
         // =============================================================================
