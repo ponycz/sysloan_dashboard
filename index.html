@@ -835,6 +835,39 @@
                 });
             }
             
+            // Úvěry s dopřednými úroky
+            const withDopredneUroky = loans.filter(l => l.interestType === 'PeriodStart');
+            if (withDopredneUroky.length > 0) {
+                insights.push({
+                    type: 'info',
+                    title: 'ℹ️ Úvěry s dopřednými úroky',
+                    count: withDopredneUroky.length,
+                    value: withDopredneUroky.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: withDopredneUroky.slice(0, 20).map(l => ({
+                        name: l.jmeno,
+                        value: l.vyse_uveru,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+            
+            // Úvěry s předplacenými úroky
+            const withPredplaceneUroky = loans.filter(l => l.prepaidInterestPeriodInMonths && l.prepaidInterestPeriodInMonths >= 1);
+            if (withPredplaceneUroky.length > 0) {
+                insights.push({
+                    type: 'info',
+                    title: 'ℹ️ Úvěry s předplacenými úroky',
+                    count: withPredplaceneUroky.length,
+                    value: withPredplaceneUroky.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: withPredplaceneUroky.sort((a, b) => (b.prepaidInterestPeriodInMonths || 0) - (a.prepaidInterestPeriodInMonths || 0)).slice(0, 20).map(l => ({
+                        name: l.jmeno,
+                        prepaidMonths: l.prepaidInterestPeriodInMonths,
+                        value: l.vyse_uveru,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+            
             return insights;
         }
 
@@ -1019,7 +1052,17 @@
                 <div class="stats-grid" id="statsGrid"></div>
                 
                 <div class="alerts-section">
-                    <h2 class="section-title">⚠️ Upozornění a Insights</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 class="section-title" style="margin-bottom: 0;">⚠️ Upozornění a Insights</h2>
+                        <div class="filter-group" style="margin: 0;">
+                            <label class="filter-label" style="margin-right: 0.5rem;">Stav splacení</label>
+                            <select class="filter-select" id="filterInsightsStatus" style="min-width: 120px;">
+                                <option value="">Vše</option>
+                                <option value="splaceno">Splaceno</option>
+                                <option value="nesplaceno">Nesplaceno</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="alerts-list" id="alertsGrid"></div>
                 </div>
                 
@@ -1074,7 +1117,7 @@
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label class="filter-label">Problémy</label>
+                            <label class="filter-label">Filtr</label>
                             <select class="filter-select" id="filterProblems">
                                 <option value="">Vše</option>
                                 <option value="overdue">Po splatnosti</option>
@@ -1085,6 +1128,9 @@
                                 <option value="prolonged">Prodlouženo</option>
                                 <option value="nodate">Bez data splatnosti</option>
                                 <option value="preplatek">Přeplatek > 0 Kč</option>
+                                <option value="dopredne">Dopředné úroky</option>
+                                <option value="standardni">Standardní úroky</option>
+                                <option value="predplacene">Předplacené úroky</option>
                             </select>
                         </div>
                         <div class="filter-spacer"></div>
@@ -1201,8 +1247,25 @@
             `;
         }
 
-        function renderAlerts() {
-            const alerts = DATA.insights;
+        function renderAlerts(statusFilter = '') {
+            const allAlerts = DATA.insights;
+            
+            // Filtrovat insights podle stavu splacení
+            const alerts = statusFilter ? allAlerts.map(alert => {
+                const filteredItems = alert.items.filter(item => {
+                    if (statusFilter === 'splaceno') return item.stav_splaceni === 'Splaceno';
+                    if (statusFilter === 'nesplaceno') return item.stav_splaceni === 'Nesplaceno';
+                    return true;
+                });
+                if (filteredItems.length === 0) return null;
+                return {
+                    ...alert,
+                    count: filteredItems.length,
+                    value: filteredItems.reduce((sum, item) => sum + (item.value || item.pohledavka || item.preplatek || 0), 0),
+                    items: filteredItems
+                };
+            }).filter(a => a !== null) : allAlerts;
+            
             if (alerts.length === 0) {
                 document.getElementById('alertsGrid').innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><p>Žádná upozornění</p></div>';
                 return;
@@ -1243,6 +1306,10 @@
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Pohledávka: ${formatCurrency(item.pohledavka)} • Úvěr: ${formatCurrency(item.value)}</span></div>`;
                 } else if (alert.title.includes('přeplatkem')) {
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Přeplatek: ${formatCurrency(item.preplatek)} • Úvěr: ${formatCurrency(item.value)}</span></div>`;
+                } else if (alert.title.includes('dopřednými úroky')) {
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Úvěr: ${formatCurrency(item.value)}</span></div>`;
+                } else if (alert.title.includes('předplacenými úroky')) {
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prepaidMonths} měs. • Úvěr: ${formatCurrency(item.value)}</span></div>`;
                 } else {
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${formatCurrency(item.value)}</span></div>`;
                 }
@@ -1454,6 +1521,9 @@
                     if (problems === 'prolonged' && !item.prodlouzeni) return false;
                     if (problems === 'nodate' && item.datum_parsed_valid) return false;
                     if (problems === 'preplatek' && (!item.preplatek || item.preplatek <= 0)) return false;
+                    if (problems === 'dopredne' && item.interestType !== 'PeriodStart') return false;
+                    if (problems === 'standardni' && item.interestType !== 'PeriodEnd') return false;
+                    if (problems === 'predplacene' && (!item.prepaidInterestPeriodInMonths || item.prepaidInterestPeriodInMonths < 1)) return false;
                 }
                 return true;
             });
@@ -1475,8 +1545,8 @@
 
         function renderTable() {
             const start = (currentPage - 1) * pageSize, end = start + pageSize, pageData = filteredData.slice(start, end);
-            const headers = ['Název úvěru', 'Vlastník', 'Typ', 'Tranší', 'Rating', 'LTV', 'Splatnost', 'Výše úvěru', 'Zástava', 'Přeplatek', 'Stav', 'Problémy'];
-            const headerColumns = ['jmeno', 'vlastnik', 'typ', 'tranches_count', 'rating', 'ltv_uveru', 'datum_splatnosti', 'vyse_uveru', 'velikost_zastavy', 'preplatek', 'stav_splaceni', ''];
+            const headers = ['Název úvěru', 'Vlastník', 'Typ', 'Tranší', 'Rating', 'LTV', 'Splatnost', 'Výše úvěru', 'Zástava', 'Přeplatek', 'Úroky', 'Předpl.', 'Stav', 'Značky'];
+            const headerColumns = ['jmeno', 'vlastnik', 'typ', 'tranches_count', 'rating', 'ltv_uveru', 'datum_splatnosti', 'vyse_uveru', 'velikost_zastavy', 'preplatek', 'interestType', 'prepaidInterestPeriodInMonths', 'stav_splaceni', ''];
 
             document.getElementById('tableHeader').innerHTML = headers.map((h, i) => {
                 const col = headerColumns[i];
@@ -1484,7 +1554,7 @@
             }).join('');
 
             if (pageData.length === 0) {
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="12" class="empty-state">Žádné záznamy</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="14" class="empty-state">Žádné záznamy</td></tr>';
             } else {
                 document.getElementById('tableBody').innerHTML = pageData.map(item => {
                     const problems = [];
@@ -1500,6 +1570,11 @@
                     const ltv = item.ltv_uveru;
                     const ltvClass = ltv > 75 ? 'high' : ltv > 65 ? 'medium' : '';
                     const ltvBar = ltv !== null ? `<span class="ltv-bar"><span class="ltv-fill ${ltvClass}" style="width: ${Math.min(ltv, 100)}%"></span></span>` : '';
+                    
+                    // Úroky: D = dopředné (PeriodStart), S = standardní (PeriodEnd)
+                    const interestDisplay = item.interestType === 'PeriodStart' ? 'D' : item.interestType === 'PeriodEnd' ? 'S' : '-';
+                    // Předplacené úroky
+                    const prepaidDisplay = item.prepaidInterestPeriodInMonths && item.prepaidInterestPeriodInMonths >= 1 ? item.prepaidInterestPeriodInMonths : '-';
 
                     return `<tr>
                         <td class="cell-name" title="${item.jmeno}">${item.jmeno}</td>
@@ -1512,6 +1587,8 @@
                         <td class="cell-number">${formatCurrency(item.vyse_uveru)}</td>
                         <td class="cell-number">${formatCurrency(item.velikost_zastavy)}</td>
                         <td class="cell-number">${item.preplatek ? formatCurrency(item.preplatek) : '-'}</td>
+                        <td class="cell-number">${interestDisplay}</td>
+                        <td class="cell-number">${prepaidDisplay}</td>
                         <td><span class="badge badge-status ${statusClass}">${item.stav_splaceni || '-'}</span></td>
                         <td>${problems.join(' ') || '-'}</td>
                     </tr>`;
@@ -1676,6 +1753,7 @@
 
             document.getElementById('filterOwnersStatus').addEventListener('change', (e) => renderOwnersTab(e.target.value));
             document.getElementById('filterOverviewStatus').addEventListener('change', (e) => renderOverviewCharts(e.target.value));
+            document.getElementById('filterInsightsStatus').addEventListener('change', (e) => renderAlerts(e.target.value));
             
             // Přepínač motivu
             document.getElementById('themeToggle').addEventListener('click', toggleTheme);
