@@ -394,6 +394,10 @@
             </div>
             <div class="header-right">
                 <div class="data-note">⚠️ Statistiky bez <span id="missingDateCount">0</span> úvěrů bez data splatnosti</div>
+                <button class="theme-toggle" id="precisionToggle" title="Přepnout přesnost částek">
+                    <span class="icon" id="precisionIcon">🔢</span>
+                    <span id="precisionText">Zaokrouhlené</span>
+                </button>
                 <button class="theme-toggle" id="themeToggle" title="Přepnout motiv">
                     <span class="icon" id="themeIcon">🌙</span>
                     <span id="themeText">Tmavý</span>
@@ -462,9 +466,53 @@
         initTheme();
 
         // =============================================================================
+        // PŘEPÍNAČ PŘESNOSTI ČÁSTEK
+        // =============================================================================
+        let usePreciseCurrency = false;
+
+        function initPrecision() {
+            const savedPrecision = localStorage.getItem('sysloan-precision');
+            if (savedPrecision === 'precise') {
+                usePreciseCurrency = true;
+                updatePrecisionButton(true);
+            }
+        }
+
+        function togglePrecision() {
+            usePreciseCurrency = !usePreciseCurrency;
+            localStorage.setItem('sysloan-precision', usePreciseCurrency ? 'precise' : 'rounded');
+            updatePrecisionButton(usePreciseCurrency);
+            
+            // Překreslit dashboard s novým formátováním
+            if (DATA) {
+                renderStats();
+                renderAlerts(document.getElementById('filterInsightsStatus')?.value || '');
+                applyFilters();
+                applyFiltersTranche();
+                renderOwnersTab(document.getElementById('filterOwnersStatus')?.value || '');
+            }
+        }
+
+        function updatePrecisionButton(isPrecise) {
+            const icon = document.getElementById('precisionIcon');
+            const text = document.getElementById('precisionText');
+            if (icon && text) {
+                icon.textContent = isPrecise ? '🎯' : '🔢';
+                text.textContent = isPrecise ? 'Přesné' : 'Zaokrouhlené';
+            }
+        }
+
+        // Inicializace přesnosti při načtení
+        initPrecision();
+
+        // =============================================================================
         // POMOCNÉ FUNKCE
         // =============================================================================
-        const formatCurrency = (value) => value === null || value === undefined ? '-' : new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 }).format(value);
+        const formatCurrency = (value) => {
+            if (value === null || value === undefined) return '-';
+            const digits = usePreciseCurrency ? 2 : 0;
+            return new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+        };
         const formatNumber = (value) => value === null || value === undefined ? '-' : new Intl.NumberFormat('cs-CZ').format(value);
         const formatPercent = (value) => value === null || value === undefined ? '-' : value.toFixed(1) + ' %';
 
@@ -1755,8 +1803,9 @@
             document.getElementById('filterOverviewStatus').addEventListener('change', (e) => renderOverviewCharts(e.target.value));
             document.getElementById('filterInsightsStatus').addEventListener('change', (e) => renderAlerts(e.target.value));
             
-            // Přepínač motivu
+            // Přepínač motivu a přesnosti
             document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('precisionToggle').addEventListener('click', togglePrecision);
         }
 
         // =============================================================================
