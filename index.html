@@ -902,6 +902,7 @@
                     items: withDopredneUroky.map(l => ({
                         name: l.jmeno,
                         value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
                         stav_splaceni: l.stav_splaceni
                     }))
                 });
@@ -919,6 +920,7 @@
                         name: l.jmeno,
                         prepaidMonths: l.prepaidInterestPeriodInMonths,
                         value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
                         stav_splaceni: l.stav_splaceni
                     }))
                 });
@@ -1383,9 +1385,9 @@
                 } else if (alert.title.includes('přeplatkem')) {
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Přeplatek: ${formatCurrency(item.preplatek)} • Úvěr: ${formatCurrency(item.value)}</span></div>`;
                 } else if (alert.title.includes('dopřednými úroky')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Úvěr: ${formatCurrency(item.value)}</span></div>`;
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Úvěr: ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
                 } else if (alert.title.includes('předplacenými úroky')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prepaidMonths} měs. • Úvěr: ${formatCurrency(item.value)}</span></div>`;
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prepaidMonths} měs. • Úvěr: ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
                 } else if (alert.title.includes('méně prostředků než zálohy')) {
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Rozdíl: ${formatCurrency(item.rozdil)} (účet: ${formatCurrency(item.bankAccountBalance)}, přeplatek: ${formatCurrency(item.preplatek)})</span></div>`;
                 } else {
