@@ -332,6 +332,8 @@
         .badge-rating.b { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
         .badge-rating.c { background: rgba(245, 158, 11, 0.15); color: var(--accent-yellow); }
         .badge-type { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+        .badge-type.jednorazovy { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .badge-type.transovy { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
         .badge-status { padding: 0.2rem 0.4rem; }
         .badge-status.splaceno { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
         .badge-status.nesplaceno { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
@@ -593,6 +595,7 @@
                     ltv_uveru: ltvUveru,
                     ltv_transe: ltvTranse,
                     velikost_zastavy: loan.zastava || 0,
+                    aktualniJistina: loan.aktualniJistina,
                     uver_nad_ramec: loan.vyse_uveru > loan.vyse_ramec && loan.vyse_ramec > 0,
                     preplatek: loan.advancesBalance || 0
                 };
@@ -740,6 +743,7 @@
                         date: l.datum_splatnosti,
                         days: Math.abs(l.days_to_maturity),
                         value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
                         stav_splaceni: l.stav_splaceni
                     }))
                 });
@@ -758,6 +762,7 @@
                         date: l.datum_splatnosti,
                         days: l.days_to_maturity,
                         value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
                         stav_splaceni: l.stav_splaceni
                     }))
                 });
@@ -776,6 +781,7 @@
                         date: l.datum_splatnosti,
                         days: l.days_to_maturity,
                         value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
                         stav_splaceni: l.stav_splaceni
                     }))
                 });
@@ -793,6 +799,7 @@
                         name: l.jmeno,
                         ltv: l.ltv_uveru,
                         value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
                         stav_splaceni: l.stav_splaceni
                     }))
                 });
@@ -828,6 +835,7 @@
                         name: l.jmeno,
                         prodlouzeni: l.prodlouzeni,
                         value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
                         stav_splaceni: l.stav_splaceni
                     }))
                 });
@@ -1358,17 +1366,18 @@
         function renderAlertItems(alert) {
             return alert.items.map(item => {
                 const statusBadge = item.stav_splaceni ? `<span class="alert-item-status ${item.stav_splaceni === 'Splaceno' ? 'splaceno' : 'nesplaceno'}">${item.stav_splaceni}</span>` : '';
+                const jistinaInfo = item.aktualniJistina !== null && item.aktualniJistina !== undefined ? ` • Akt. jistina: ${formatCurrency(item.aktualniJistina)}` : '';
                 
                 if (alert.title.includes('po splatnosti')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.date} (${item.days} dní po) • ${formatCurrency(item.value)}</span></div>`;
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.date} (${item.days} dní po) • ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
                 } else if (alert.title.includes('Splatnost do') || alert.title.includes('30 dní') || alert.title.includes('90 dní')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.date} (za ${item.days} dní) • ${formatCurrency(item.value)}</span></div>`;
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.date} (za ${item.days} dní) • ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
                 } else if (alert.title.includes('LTV')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">LTV ${item.ltv.toFixed(1)}% • ${formatCurrency(item.value)}</span></div>`;
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">LTV ${item.ltv.toFixed(1)}% • ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
                 } else if (alert.title.includes('rámec')) {
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">+${formatCurrency(item.diff)} nad rámec • ${formatCurrency(item.uver)}</span></div>`;
                 } else if (alert.title.includes('Prodlouž')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prodlouzeni}× prodlouženo • ${formatCurrency(item.value)}</span></div>`;
+                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prodlouzeni}× prodlouženo • ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
                 } else if (alert.title.includes('pohledávkou')) {
                     return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Pohledávka: ${formatCurrency(item.pohledavka)} • Úvěr: ${formatCurrency(item.value)}</span></div>`;
                 } else if (alert.title.includes('přeplatkem')) {
@@ -1614,8 +1623,8 @@
 
         function renderTable() {
             const start = (currentPage - 1) * pageSize, end = start + pageSize, pageData = filteredData.slice(start, end);
-            const headers = ['Název úvěru', 'Vlastník', 'Typ', 'Tranší', 'Rating', 'LTV', 'Splatnost', 'Výše úvěru', 'Zástava', 'Přeplatek', 'Úroky', 'Předpl.', 'Stav', 'Značky'];
-            const headerColumns = ['jmeno', 'vlastnik', 'typ', 'tranches_count', 'rating', 'ltv_uveru', 'datum_splatnosti', 'vyse_uveru', 'velikost_zastavy', 'preplatek', 'interestType', 'prepaidInterestPeriodInMonths', 'stav_splaceni', ''];
+            const headers = ['Název úvěru', 'Vlastník', 'Typ', 'Tranší', 'Rating', 'LTV', 'Splatnost', 'Výše úvěru', 'Akt. jistina', 'Přeplatek', 'Úroky', 'Předpl.', 'Stav', 'Značky'];
+            const headerColumns = ['jmeno', 'vlastnik', 'typ', 'tranches_count', 'rating', 'ltv_uveru', 'datum_splatnosti', 'vyse_uveru', 'aktualniJistina', 'preplatek', 'interestType', 'prepaidInterestPeriodInMonths', 'stav_splaceni', ''];
 
             document.getElementById('tableHeader').innerHTML = headers.map((h, i) => {
                 const col = headerColumns[i];
@@ -1644,17 +1653,19 @@
                     const interestDisplay = item.interestType === 'PeriodStart' ? 'D' : item.interestType === 'PeriodEnd' ? 'S' : '-';
                     // Předplacené úroky
                     const prepaidDisplay = item.prepaidInterestPeriodInMonths && item.prepaidInterestPeriodInMonths >= 1 ? item.prepaidInterestPeriodInMonths : '-';
+                    // Barevné odlišení typu úvěru
+                    const typeClass = item.typ === 'Jednorázový' ? 'jednorazovy' : item.typ === 'Tranšový' ? 'transovy' : '';
 
                     return `<tr>
                         <td class="cell-name" title="${item.jmeno}">${item.jmeno}</td>
                         <td class="cell-owner" title="${item.vlastnik || ''}">${item.vlastnik || '-'}</td>
-                        <td><span class="badge badge-type">${item.typ || '-'}</span></td>
+                        <td><span class="badge badge-type ${typeClass}">${item.typ || '-'}</span></td>
                         <td class="cell-number">${item.tranches_count || 1}</td>
                         <td><span class="badge badge-rating ${ratingClass}">${item.rating || '-'}</span></td>
                         <td class="cell-number">${formatPercent(ltv)} ${ltvBar}</td>
                         <td>${item.datum_splatnosti || '-'}</td>
                         <td class="cell-number">${formatCurrency(item.vyse_uveru)}</td>
-                        <td class="cell-number">${formatCurrency(item.velikost_zastavy)}</td>
+                        <td class="cell-number">${item.aktualniJistina !== null && item.aktualniJistina !== undefined ? formatCurrency(item.aktualniJistina) : '-'}</td>
                         <td class="cell-number">${item.preplatek ? formatCurrency(item.preplatek) : '-'}</td>
                         <td class="cell-number">${interestDisplay}</td>
                         <td class="cell-number">${prepaidDisplay}</td>
