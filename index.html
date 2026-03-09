@@ -735,7 +735,7 @@
                     title: '🚨 Úvěry po splatnosti (nesplacené)',
                     count: overdue.length,
                     value: overdue.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: overdue.sort((a, b) => a.days_to_maturity - b.days_to_maturity).slice(0, 100).map(l => ({
+                    items: overdue.sort((a, b) => a.days_to_maturity - b.days_to_maturity).map(l => ({
                         name: l.jmeno,
                         date: l.datum_splatnosti,
                         days: Math.abs(l.days_to_maturity),
@@ -753,7 +753,7 @@
                     title: '⚠️ Splatnost do 30 dní (nesplacené)',
                     count: soon30.length,
                     value: soon30.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: soon30.sort((a, b) => a.days_to_maturity - b.days_to_maturity).slice(0, 100).map(l => ({
+                    items: soon30.sort((a, b) => a.days_to_maturity - b.days_to_maturity).map(l => ({
                         name: l.jmeno,
                         date: l.datum_splatnosti,
                         days: l.days_to_maturity,
@@ -771,7 +771,7 @@
                     title: '⚠️ Splatnost 30-90 dní (nesplacené)',
                     count: soon90.length,
                     value: soon90.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: soon90.sort((a, b) => a.days_to_maturity - b.days_to_maturity).slice(0, 100).map(l => ({
+                    items: soon90.sort((a, b) => a.days_to_maturity - b.days_to_maturity).map(l => ({
                         name: l.jmeno,
                         date: l.datum_splatnosti,
                         days: l.days_to_maturity,
@@ -789,7 +789,7 @@
                     title: '⚠️ Vysoké LTV (> 75%)',
                     count: highLtv.length,
                     value: highLtv.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: highLtv.sort((a, b) => b.ltv_uveru - a.ltv_uveru).slice(0, 100).map(l => ({
+                    items: highLtv.sort((a, b) => b.ltv_uveru - a.ltv_uveru).map(l => ({
                         name: l.jmeno,
                         ltv: l.ltv_uveru,
                         value: l.vyse_uveru,
@@ -806,7 +806,7 @@
                     title: '🚨 Úvěry překračující rámec',
                     count: overFrame.length,
                     value: overFrame.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: overFrame.slice(0, 100).map(l => ({
+                    items: overFrame.map(l => ({
                         name: l.jmeno,
                         uver: l.vyse_uveru,
                         ramec: l.vyse_ramec,
@@ -824,7 +824,7 @@
                     title: 'ℹ️ Prodloužené úvěry',
                     count: prolonged.length,
                     value: prolonged.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: prolonged.sort((a, b) => b.prodlouzeni - a.prodlouzeni).slice(0, 100).map(l => ({
+                    items: prolonged.sort((a, b) => b.prodlouzeni - a.prodlouzeni).map(l => ({
                         name: l.jmeno,
                         prodlouzeni: l.prodlouzeni,
                         value: l.vyse_uveru,
@@ -841,7 +841,7 @@
                     title: 'ℹ️ Úvěry bez data splatnosti',
                     count: noDate.length,
                     value: noDate.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: noDate.slice(0, 100).map(l => ({
+                    items: noDate.map(l => ({
                         name: l.jmeno,
                         value: l.vyse_uveru,
                         stav_splaceni: l.stav_splaceni
@@ -857,7 +857,7 @@
                     title: '⚠️ Úvěry s pohledávkou > 0',
                     count: withPohledavka.length,
                     value: withPohledavka.reduce((sum, l) => sum + (l.pohledavky || 0), 0),
-                    items: withPohledavka.sort((a, b) => (b.pohledavky || 0) - (a.pohledavky || 0)).slice(0, 100).map(l => ({
+                    items: withPohledavka.sort((a, b) => (b.pohledavky || 0) - (a.pohledavky || 0)).map(l => ({
                         name: l.jmeno,
                         pohledavka: l.pohledavky,
                         value: l.vyse_uveru,
@@ -874,7 +874,7 @@
                     title: 'ℹ️ Splacené úvěry s přeplatkem > 0 Kč',
                     count: withPreplatek.length,
                     value: withPreplatek.reduce((sum, l) => sum + (l.preplatek || 0), 0),
-                    items: withPreplatek.sort((a, b) => (b.preplatek || 0) - (a.preplatek || 0)).slice(0, 100).map(l => ({
+                    items: withPreplatek.sort((a, b) => (b.preplatek || 0) - (a.preplatek || 0)).map(l => ({
                         name: l.jmeno,
                         preplatek: l.preplatek,
                         value: l.vyse_uveru,
@@ -891,7 +891,7 @@
                     title: 'ℹ️ Úvěry s dopřednými úroky',
                     count: withDopredneUroky.length,
                     value: withDopredneUroky.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: withDopredneUroky.slice(0, 100).map(l => ({
+                    items: withDopredneUroky.map(l => ({
                         name: l.jmeno,
                         value: l.vyse_uveru,
                         stav_splaceni: l.stav_splaceni
@@ -907,7 +907,7 @@
                     title: 'ℹ️ Úvěry s předplacenými úroky',
                     count: withPredplaceneUroky.length,
                     value: withPredplaceneUroky.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
-                    items: withPredplaceneUroky.sort((a, b) => (b.prepaidInterestPeriodInMonths || 0) - (a.prepaidInterestPeriodInMonths || 0)).slice(0, 100).map(l => ({
+                    items: withPredplaceneUroky.sort((a, b) => (b.prepaidInterestPeriodInMonths || 0) - (a.prepaidInterestPeriodInMonths || 0)).map(l => ({
                         name: l.jmeno,
                         prepaidMonths: l.prepaidInterestPeriodInMonths,
                         value: l.vyse_uveru,
@@ -924,7 +924,7 @@
                     title: '⚠️ Účet úvěru má méně prostředků než zálohy/přeplatky',
                     count: lowBankBalance.length,
                     value: lowBankBalance.reduce((sum, l) => sum + ((l.preplatek || 0) - (l.bankAccountBalance || 0)), 0),
-                    items: lowBankBalance.sort((a, b) => ((b.preplatek || 0) - (b.bankAccountBalance || 0)) - ((a.preplatek || 0) - (a.bankAccountBalance || 0))).slice(0, 100).map(l => ({
+                    items: lowBankBalance.sort((a, b) => ((b.preplatek || 0) - (b.bankAccountBalance || 0)) - ((a.preplatek || 0) - (a.bankAccountBalance || 0))).map(l => ({
                         name: l.jmeno,
                         bankAccountBalance: l.bankAccountBalance,
                         preplatek: l.preplatek,
@@ -1752,8 +1752,8 @@
 
         function renderOwnersTab(statusFilter) {
             let ownerData = statusFilter === 'splaceno' ? DATA.owner_stats_splaceno : statusFilter === 'nesplaceno' ? DATA.owner_stats_nesplaceno : DATA.owner_stats_all;
-            const topByValue = ownerData.slice(0, 100);
-            const topByCount = [...ownerData].sort((a, b) => b.count - a.count).slice(0, 100);
+            const topByValue = ownerData.slice(0, 20);
+            const topByCount = [...ownerData].sort((a, b) => b.count - a.count).slice(0, 20);
             const chartColors = getChartColors();
 
             if (ownersValueChart) ownersValueChart.destroy();
