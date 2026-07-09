@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SysLoan Dashboard | Úvěrový Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <style>
         :root {
             --bg-dark: #0a0a0f;
@@ -370,6 +373,14 @@
             .charts-grid, .owners-grid { grid-template-columns: 1fr; }
             .filters-bar { flex-direction: column; align-items: stretch; }
             .filter-select, .filter-input { width: 100%; }
+
+            /* Alerty: na úzkém displeji se položky zalamují, aby byl vidět název úvěru */
+            .alert-header { flex-wrap: wrap; }
+            .alert-title { flex-shrink: 1; min-width: 0; }
+            .alert-stats { flex-basis: 100%; order: 3; justify-content: flex-start; gap: 1rem; }
+            .alert-item { flex-wrap: wrap; }
+            .alert-item-name { flex: 1 1 100%; white-space: normal; }
+            .alert-item-meta { white-space: normal; flex-shrink: 1; }
         }
 
         .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: var(--text-muted); }
@@ -518,6 +529,17 @@
         const formatNumber = (value) => value === null || value === undefined ? '-' : new Intl.NumberFormat('cs-CZ').format(value);
         const formatPercent = (value) => value === null || value === undefined ? '-' : value.toFixed(1) + ' %';
 
+        // Escapování hodnot vkládaných do innerHTML (názvy úvěrů/vlastníků mohou obsahovat uvozovky apod.)
+        const escapeHtml = (value) => value === null || value === undefined ? '' : String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        function debounce(fn, ms) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), ms);
+            };
+        }
+
         function parseDate(dateStr) {
             if (!dateStr) return null;
             const d = new Date(dateStr);
@@ -536,28 +558,53 @@
         }
 
         // =============================================================================
-        // NAČTENÍ DAT
+        // NAČTENÍ DAT (stale-while-revalidate: nejdřív cache, na pozadí čerstvá data)
         // =============================================================================
+        const CACHE_KEY = 'sysloan-data-cache-v1';
+
         async function loadData() {
+            // 1. Okamžitě vykreslit poslední známá data z localStorage (pokud existují)
+            let renderedFromCache = false;
+            try {
+                const cached = localStorage.getItem(CACHE_KEY);
+                if (cached) {
+                    DATA = transformData(JSON.parse(cached));
+                    renderDashboard();
+                    renderedFromCache = true;
+                    document.getElementById('dateBadge').textContent += ' • ⏳ aktualizuji…';
+                }
+            } catch (e) {
+                console.warn('Cache se nepodařilo použít:', e);
+            }
+
+            // 2. Na pozadí stáhnout čerstvá data a překreslit
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL + '?action=getData');
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
+
                 const rawData = await response.json();
                 if (rawData.error) throw new Error(rawData.error);
-                
-                // Transformovat data do formátu pro dashboard
+
+                try {
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
+                } catch (e) {
+                    console.warn('Nepodařilo se uložit data do cache:', e);
+                }
+
                 DATA = transformData(rawData);
-                
-                // Vykreslit dashboard
                 renderDashboard();
-                
+
             } catch (error) {
                 console.error('Chyba při načítání dat:', error);
+                if (renderedFromCache) {
+                    const badge = document.getElementById('dateBadge');
+                    badge.textContent = badge.textContent.replace(' • ⏳ aktualizuji…', '') + ' • ⚠️ offline (data z mezipaměti)';
+                    return;
+                }
                 document.getElementById('mainContent').innerHTML = `
                     <div class="error-message">
                         <h3>❌ Chyba při načítání dat</h3>
-                        <p>${error.message}</p>
+                        <p>${escapeHtml(error.message)}</p>
                         <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
                             Zkontroluj, že data byla exportována ze SysLoanu pomocí Tampermonkey skriptu.
                         </p>
@@ -650,7 +697,10 @@
             };
             
             // Generovat insights/alerts (ty mohou obsahovat i úvěry bez data)
-            const insights = generateInsights(aggregatedLoans, processedLoans, today);
+            const insights = generateInsights(aggregatedLoans, processedLoans, today, rawData);
+
+            // Aging úvěrů po splatnosti (nesplacené)
+            const overdueAging = calculateOverdueAging(nesplaceno);
             
             // Statistiky podle ratingu (pouze úvěry s datem splatnosti)
             const ratingStatsAll = calculateRatingStats(loansWithDate);
@@ -713,6 +763,7 @@
                 ltv_distribution_nesplaceno: ltvDistNesplaceno,
                 status_stats: statusStats,
                 tranches_distribution: tranchesDist,
+                overdue_aging: overdueAging,
                 monthly,
                 owner_stats_all: ownerStatsAll,
                 owner_stats_splaceno: ownerStatsSplaceno,
@@ -727,14 +778,52 @@
             };
         }
 
-        function generateInsights(loans, tranches, today) {
+        function generateInsights(loans, tranches, today, rawData) {
             const insights = [];
-            
+            const isOverdueLoan = l => l.stav_splaceni === 'Nesplaceno' && l.days_to_maturity !== null && l.days_to_maturity < 0;
+
+            // Změny od minulého exportu (vyžaduje historii snapshotů v Google Sheets)
+            const prevSnapshot = rawData && rawData.previousSnapshot;
+            if (prevSnapshot && Array.isArray(prevSnapshot.loans) && prevSnapshot.loans.length > 0) {
+                const prevMap = new Map(prevSnapshot.loans.map(p => [p.i, p]));
+                const curIds = new Set(loans.map(l => l.loan_id));
+                const isPrevOverdue = p => {
+                    if (p.s !== 'Nesplaceno' || !p.d) return false;
+                    const d = parseDate(p.d);
+                    return d !== null && d < today;
+                };
+                const changes = [];
+                loans.forEach(l => {
+                    const p = prevMap.get(l.loan_id);
+                    if (!p) {
+                        changes.push({ name: l.jmeno, text: `🆕 Nový úvěr • ${formatCurrency(l.vyse_uveru)}` });
+                        return;
+                    }
+                    if (isOverdueLoan(l) && !isPrevOverdue(p)) changes.push({ name: l.jmeno, text: `🚨 Nově po splatnosti • ${formatCurrency(l.vyse_uveru)}` });
+                    if (p.s === 'Nesplaceno' && l.stav_splaceni === 'Splaceno') changes.push({ name: l.jmeno, text: `✅ Nově splaceno • ${formatCurrency(l.vyse_uveru)}` });
+                    if (p.s === 'Splaceno' && l.stav_splaceni === 'Nesplaceno') changes.push({ name: l.jmeno, text: `↩️ Znovu nesplaceno • ${formatCurrency(l.vyse_uveru)}` });
+                });
+                prevSnapshot.loans.forEach(p => {
+                    if (!curIds.has(p.i)) changes.push({ name: p.n, text: '❌ Již není v exportu' });
+                });
+                const prevNesplaceno = prevSnapshot.loans.filter(p => p.s === 'Nesplaceno').reduce((sum, p) => sum + (p.v || 0), 0);
+                const curNesplaceno = loans.filter(l => l.stav_splaceni === 'Nesplaceno').reduce((sum, l) => sum + (l.vyse_uveru || 0), 0);
+                insights.push({
+                    type: 'info',
+                    kind: 'trend',
+                    title: `📈 Změny od minulého exportu (${formatDate(prevSnapshot.date)})`,
+                    count: changes.length,
+                    value: curNesplaceno - prevNesplaceno,
+                    items: changes.length > 0 ? changes : [{ name: 'Žádné změny', text: 'Portfolio je beze změn' }]
+                });
+            }
+
             // Po splatnosti (nesplacené)
-            const overdue = loans.filter(l => l.stav_splaceni === 'Nesplaceno' && l.days_to_maturity !== null && l.days_to_maturity < 0);
+            const overdue = loans.filter(isOverdueLoan);
             if (overdue.length > 0) {
                 insights.push({
                     type: 'danger',
+                    kind: 'overdue',
                     title: '🚨 Úvěry po splatnosti (nesplacené)',
                     count: overdue.length,
                     value: overdue.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
@@ -748,12 +837,33 @@
                     }))
                 });
             }
+
+            // Kombinované riziko: po splatnosti + slabé krytí (LTV > 75 % nebo bez zástavy)
+            const combinedRisk = overdue.filter(l => (l.ltv_uveru !== null && l.ltv_uveru > 75) || !(l.velikost_zastavy > 0));
+            if (combinedRisk.length > 0) {
+                insights.push({
+                    type: 'danger',
+                    kind: 'combined',
+                    title: '🚨 Po splatnosti se slabým krytím (LTV > 75 % / bez zástavy)',
+                    count: combinedRisk.length,
+                    value: combinedRisk.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: combinedRisk.sort((a, b) => a.days_to_maturity - b.days_to_maturity).map(l => ({
+                        name: l.jmeno,
+                        days: Math.abs(l.days_to_maturity),
+                        ltv: l.ltv_uveru,
+                        zastava: l.velikost_zastavy,
+                        value: l.vyse_uveru,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
             
             // Splatnost do 30 dní (nesplacené)
             const soon30 = loans.filter(l => l.stav_splaceni === 'Nesplaceno' && l.days_to_maturity !== null && l.days_to_maturity >= 0 && l.days_to_maturity <= 30);
             if (soon30.length > 0) {
                 insights.push({
                     type: 'warning',
+                    kind: 'due',
                     title: '⚠️ Splatnost do 30 dní (nesplacené)',
                     count: soon30.length,
                     value: soon30.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
@@ -773,10 +883,37 @@
             if (soon90.length > 0) {
                 insights.push({
                     type: 'warning',
+                    kind: 'due',
                     title: '⚠️ Splatnost 30-90 dní (nesplacené)',
                     count: soon90.length,
                     value: soon90.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
                     items: soon90.sort((a, b) => a.days_to_maturity - b.days_to_maturity).map(l => ({
+                        name: l.jmeno,
+                        date: l.datum_splatnosti,
+                        days: l.days_to_maturity,
+                        value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
+            // Splatnost v tomto a příštím kalendářním měsíci (nesplacené, ještě před splatností)
+            const curMonthKey = today.getFullYear() * 12 + today.getMonth();
+            const dueCalendar = loans.filter(l => {
+                if (l.stav_splaceni !== 'Nesplaceno' || !l.datum_timestamp || l.days_to_maturity < 0) return false;
+                const d = new Date(l.datum_timestamp);
+                const key = d.getFullYear() * 12 + d.getMonth();
+                return key === curMonthKey || key === curMonthKey + 1;
+            });
+            if (dueCalendar.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    kind: 'due',
+                    title: '📆 Splatnost tento a příští měsíc (nesplacené)',
+                    count: dueCalendar.length,
+                    value: dueCalendar.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: dueCalendar.sort((a, b) => a.days_to_maturity - b.days_to_maturity).map(l => ({
                         name: l.jmeno,
                         date: l.datum_splatnosti,
                         days: l.days_to_maturity,
@@ -792,6 +929,7 @@
             if (highLtv.length > 0) {
                 insights.push({
                     type: 'warning',
+                    kind: 'highltv',
                     title: '⚠️ Vysoké LTV (> 75%)',
                     count: highLtv.length,
                     value: highLtv.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
@@ -804,12 +942,68 @@
                     }))
                 });
             }
+
+            // Nesplacené úvěry bez zástavy
+            const noCollateral = loans.filter(l => l.stav_splaceni === 'Nesplaceno' && !(l.velikost_zastavy > 0));
+            if (noCollateral.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    kind: 'nocollateral',
+                    title: '⚠️ Nesplacené úvěry bez zástavy',
+                    count: noCollateral.length,
+                    value: noCollateral.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: noCollateral.sort((a, b) => (b.vyse_uveru || 0) - (a.vyse_uveru || 0)).map(l => ({
+                        name: l.jmeno,
+                        value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
+            // Nesplacené úvěry s nízkým ratingem (C a horší)
+            const lowRating = loans.filter(l => l.stav_splaceni === 'Nesplaceno' && /^[CD]/.test(l.rating || ''));
+            if (lowRating.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    kind: 'lowrating',
+                    title: '⚠️ Nesplacené úvěry s nízkým ratingem (C a horší)',
+                    count: lowRating.length,
+                    value: lowRating.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: lowRating.sort((a, b) => (a.rating || '').localeCompare(b.rating || '')).map(l => ({
+                        name: l.jmeno,
+                        rating: l.rating,
+                        value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
+            // Aktuální jistina vyšší než výše úvěru (anomálie v datech)
+            const jistinaAnomaly = loans.filter(l => l.aktualniJistina !== null && l.aktualniJistina !== undefined && l.vyse_uveru > 0 && l.aktualniJistina > l.vyse_uveru);
+            if (jistinaAnomaly.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    kind: 'anomaly',
+                    title: '⚠️ Aktuální jistina vyšší než výše úvěru',
+                    count: jistinaAnomaly.length,
+                    value: jistinaAnomaly.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: jistinaAnomaly.sort((a, b) => (b.aktualniJistina - b.vyse_uveru) - (a.aktualniJistina - a.vyse_uveru)).map(l => ({
+                        name: l.jmeno,
+                        aktualniJistina: l.aktualniJistina,
+                        value: l.vyse_uveru,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
             
             // Překročený rámec
             const overFrame = loans.filter(l => l.uver_nad_ramec);
             if (overFrame.length > 0) {
                 insights.push({
                     type: 'danger',
+                    kind: 'overframe',
                     title: '🚨 Úvěry překračující rámec',
                     count: overFrame.length,
                     value: overFrame.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
@@ -823,11 +1017,50 @@
                 });
             }
             
+            // Čerpání rámce ≥ 90 % u tranšových úvěrů (rámec se blíží vyčerpání)
+            const frameNearlyFull = loans.filter(l => l.typ === 'Tranšový' && l.vyse_ramec > 0 && l.vyse_uveru >= 0.9 * l.vyse_ramec && l.vyse_uveru <= l.vyse_ramec);
+            if (frameNearlyFull.length > 0) {
+                insights.push({
+                    type: 'info',
+                    kind: 'framefull',
+                    title: 'ℹ️ Čerpání rámce ≥ 90 % (tranšové)',
+                    count: frameNearlyFull.length,
+                    value: frameNearlyFull.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: frameNearlyFull.sort((a, b) => (b.vyse_uveru / b.vyse_ramec) - (a.vyse_uveru / a.vyse_ramec)).map(l => ({
+                        name: l.jmeno,
+                        pct: l.vyse_uveru / l.vyse_ramec * 100,
+                        value: l.vyse_uveru,
+                        ramec: l.vyse_ramec,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
+            // Vícekrát prodloužené úvěry (2× a více)
+            const multiProlonged = loans.filter(l => (l.prodlouzeni || 0) >= 2);
+            if (multiProlonged.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    kind: 'prolonged',
+                    title: '⚠️ Prodloužené 2× a více',
+                    count: multiProlonged.length,
+                    value: multiProlonged.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: multiProlonged.sort((a, b) => b.prodlouzeni - a.prodlouzeni).map(l => ({
+                        name: l.jmeno,
+                        prodlouzeni: l.prodlouzeni,
+                        value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
             // Prodloužené úvěry
             const prolonged = loans.filter(l => l.prodlouzeni && l.prodlouzeni > 0);
             if (prolonged.length > 0) {
                 insights.push({
                     type: 'info',
+                    kind: 'prolonged',
                     title: 'ℹ️ Prodloužené úvěry',
                     count: prolonged.length,
                     value: prolonged.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
@@ -846,6 +1079,7 @@
             if (noDate.length > 0) {
                 insights.push({
                     type: 'info',
+                    kind: 'nodate',
                     title: 'ℹ️ Úvěry bez data splatnosti',
                     count: noDate.length,
                     value: noDate.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
@@ -862,6 +1096,7 @@
             if (withPohledavka.length > 0) {
                 insights.push({
                     type: 'warning',
+                    kind: 'pohledavka',
                     title: '⚠️ Úvěry s pohledávkou > 0',
                     count: withPohledavka.length,
                     value: withPohledavka.reduce((sum, l) => sum + (l.pohledavky || 0), 0),
@@ -879,6 +1114,7 @@
             if (withPreplatek.length > 0) {
                 insights.push({
                     type: 'info',
+                    kind: 'preplatek',
                     title: 'ℹ️ Splacené úvěry s přeplatkem > 0 Kč',
                     count: withPreplatek.length,
                     value: withPreplatek.reduce((sum, l) => sum + (l.preplatek || 0), 0),
@@ -896,6 +1132,7 @@
             if (withDopredneUroky.length > 0) {
                 insights.push({
                     type: 'info',
+                    kind: 'dopredne',
                     title: 'ℹ️ Úvěry s dopřednými úroky',
                     count: withDopredneUroky.length,
                     value: withDopredneUroky.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
@@ -913,6 +1150,7 @@
             if (withPredplaceneUroky.length > 0) {
                 insights.push({
                     type: 'info',
+                    kind: 'predplacene',
                     title: 'ℹ️ Úvěry s předplacenými úroky',
                     count: withPredplaceneUroky.length,
                     value: withPredplaceneUroky.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
@@ -931,6 +1169,7 @@
             if (lowBankBalance.length > 0) {
                 insights.push({
                     type: 'warning',
+                    kind: 'lowbank',
                     title: '⚠️ Účet úvěru má méně prostředků než zálohy/přeplatky',
                     count: lowBankBalance.length,
                     value: lowBankBalance.reduce((sum, l) => sum + ((l.preplatek || 0) - (l.bankAccountBalance || 0)), 0),
@@ -944,7 +1183,78 @@
                     }))
                 });
             }
-            
+
+            // Koncentrace dlužníků: vlastník s podílem > 5 % objemu portfolia
+            const totalVolume = loans.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0);
+            if (totalVolume > 0) {
+                const byOwner = {};
+                loans.forEach(l => {
+                    const owner = l.vlastnik || 'N/A';
+                    if (!byOwner[owner]) byOwner[owner] = { count: 0, value: 0 };
+                    byOwner[owner].count++;
+                    byOwner[owner].value += l.vyse_uveru || 0;
+                });
+                const concentrated = Object.entries(byOwner)
+                    .map(([owner, d]) => ({ owner, count: d.count, value: d.value, share: d.value / totalVolume * 100 }))
+                    .filter(o => o.share > 5)
+                    .sort((a, b) => b.share - a.share);
+                if (concentrated.length > 0) {
+                    insights.push({
+                        type: 'info',
+                        kind: 'concentration',
+                        title: 'ℹ️ Koncentrace dlužníků (> 5 % portfolia)',
+                        count: concentrated.length,
+                        value: concentrated.reduce((sum, o) => sum + o.value, 0),
+                        items: concentrated.map(o => ({
+                            name: o.owner,
+                            share: o.share,
+                            pocet: o.count,
+                            value: o.value
+                        }))
+                    });
+                }
+            }
+
+            // Kvalita dat: chybějící rating, LTV nebo zástava
+            const qualityIssues = loans.map(l => {
+                const missing = [];
+                if (!l.rating) missing.push('rating');
+                if (l.ltv_uveru === null) missing.push('LTV');
+                if (!(l.velikost_zastavy > 0)) missing.push('zástava');
+                return missing.length > 0 ? { l, missing } : null;
+            }).filter(Boolean);
+            if (qualityIssues.length > 0) {
+                insights.push({
+                    type: 'info',
+                    kind: 'quality',
+                    title: 'ℹ️ Neúplná data (chybí rating / LTV / zástava)',
+                    count: qualityIssues.length,
+                    value: qualityIssues.reduce((sum, q) => sum + (q.l.vyse_uveru || 0), 0),
+                    items: qualityIssues.map(q => ({
+                        name: q.l.jmeno,
+                        missing: q.missing.join(', '),
+                        value: q.l.vyse_uveru,
+                        stav_splaceni: q.l.stav_splaceni
+                    }))
+                });
+            }
+
+            // Úvěry, u kterých export nezískal kompletní data (i po opakovaných pokusech)
+            const failedLoans = (rawData && rawData.failedLoans) || [];
+            if (failedLoans.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    kind: 'exporterror',
+                    title: '⚠️ Úvěry s chybou při exportu (nekompletní data)',
+                    count: failedLoans.length,
+                    value: null,
+                    items: failedLoans.map(f => ({
+                        name: f.name,
+                        error: f.error
+                    }))
+                });
+            }
+
             return insights;
         }
 
@@ -1020,6 +1330,29 @@
             return Object.entries(dist)
                 .map(([tranches, count]) => ({ tranches: parseInt(tranches), count }))
                 .sort((a, b) => a.tranches - b.tranches);
+        }
+
+        // Aging úvěrů po splatnosti - jak dlouho jsou nesplacené úvěry po splatnosti
+        function calculateOverdueAging(loans) {
+            const buckets = [
+                { range: '1–30 dní', min: 1, max: 30 },
+                { range: '31–90 dní', min: 31, max: 90 },
+                { range: '91–180 dní', min: 91, max: 180 },
+                { range: '181–365 dní', min: 181, max: 365 },
+                { range: '365+ dní', min: 366, max: Infinity }
+            ];
+            const overdueLoans = loans.filter(l => l.days_to_maturity !== null && l.days_to_maturity < 0);
+            return buckets.map(b => {
+                const inBucket = overdueLoans.filter(l => {
+                    const days = -l.days_to_maturity;
+                    return days >= b.min && days <= b.max;
+                });
+                return {
+                    range: b.range,
+                    count: inBucket.length,
+                    value: inBucket.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0)
+                };
+            });
         }
 
         function calculateMonthlyMaturity(loans) {
@@ -1312,6 +1645,7 @@
 
         function renderStats() {
             const stats = DATA.stats;
+            const overduePct = stats.total_value > 0 ? (stats.overdue_value / stats.total_value * 100) : 0;
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card"><div class="stat-label">Úvěrů (s datem)</div><div class="stat-value">${formatNumber(stats.total_loans_with_date)}</div><div class="stat-sub">z ${formatNumber(stats.total_loans)} celkem</div></div>
                 <div class="stat-card"><div class="stat-label">Celkem tranší</div><div class="stat-value">${formatNumber(stats.total_tranches)}</div><div class="stat-sub">všechny tranše</div></div>
@@ -1320,7 +1654,7 @@
                 <div class="stat-card"><div class="stat-label">Průměrné LTV</div><div class="stat-value">${stats.avg_ltv.toFixed(1)}%</div><div class="stat-sub">Loan-to-Value</div></div>
                 <div class="stat-card success"><div class="stat-label">Splaceno</div><div class="stat-value success">${formatNumber(stats.splaceno_count)}</div><div class="stat-sub">${formatCurrency(stats.splaceno_value)}</div></div>
                 <div class="stat-card warning"><div class="stat-label">Nesplaceno</div><div class="stat-value warning">${formatNumber(stats.nesplaceno_count)}</div><div class="stat-sub">${formatCurrency(stats.nesplaceno_value)}</div></div>
-                <div class="stat-card danger"><div class="stat-label">Po splatnosti</div><div class="stat-value danger">${formatNumber(stats.overdue_count)}</div><div class="stat-sub">${formatCurrency(stats.overdue_value)}</div></div>
+                <div class="stat-card danger"><div class="stat-label">Po splatnosti</div><div class="stat-value danger">${formatNumber(stats.overdue_count)}</div><div class="stat-sub">${formatCurrency(stats.overdue_value)} • ${overduePct.toFixed(1)} % objemu</div></div>
             `;
         }
 
@@ -1369,30 +1703,71 @@
             return alert.items.map(item => {
                 const statusBadge = item.stav_splaceni ? `<span class="alert-item-status ${item.stav_splaceni === 'Splaceno' ? 'splaceno' : 'nesplaceno'}">${item.stav_splaceni}</span>` : '';
                 const jistinaInfo = item.aktualniJistina !== null && item.aktualniJistina !== undefined ? ` • Akt. jistina: ${formatCurrency(item.aktualniJistina)}` : '';
-                
-                if (alert.title.includes('po splatnosti')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.date} (${item.days} dní po) • ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
-                } else if (alert.title.includes('Splatnost do') || alert.title.includes('30 dní') || alert.title.includes('90 dní')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.date} (za ${item.days} dní) • ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
-                } else if (alert.title.includes('LTV')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">LTV ${item.ltv.toFixed(1)}% • ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
-                } else if (alert.title.includes('rámec')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">+${formatCurrency(item.diff)} nad rámec • ${formatCurrency(item.uver)}</span></div>`;
-                } else if (alert.title.includes('Prodlouž')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prodlouzeni}× prodlouženo • ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
-                } else if (alert.title.includes('pohledávkou')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Pohledávka: ${formatCurrency(item.pohledavka)} • Úvěr: ${formatCurrency(item.value)}</span></div>`;
-                } else if (alert.title.includes('přeplatkem')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Přeplatek: ${formatCurrency(item.preplatek)} • Úvěr: ${formatCurrency(item.value)}</span></div>`;
-                } else if (alert.title.includes('dopřednými úroky')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Úvěr: ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
-                } else if (alert.title.includes('předplacenými úroky')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${item.prepaidMonths} měs. • Úvěr: ${formatCurrency(item.value)}${jistinaInfo}</span></div>`;
-                } else if (alert.title.includes('méně prostředků než zálohy')) {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">Rozdíl: ${formatCurrency(item.rozdil)} (účet: ${formatCurrency(item.bankAccountBalance)}, přeplatek: ${formatCurrency(item.preplatek)})</span></div>`;
-                } else {
-                    return `<div class="alert-item"><span class="alert-item-name">${item.name}</span>${statusBadge}<span class="alert-item-meta">${formatCurrency(item.value)}</span></div>`;
+                let meta;
+
+                switch (alert.kind) {
+                    case 'overdue':
+                        meta = `${item.date} (${item.days} dní po) • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'combined':
+                        meta = `${item.days} dní po • LTV ${item.ltv !== null ? item.ltv.toFixed(1) + '%' : '-'} • zástava ${formatCurrency(item.zastava || 0)} • ${formatCurrency(item.value)}`;
+                        break;
+                    case 'due':
+                        meta = `${item.date} (za ${item.days} dní) • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'highltv':
+                        meta = `LTV ${item.ltv.toFixed(1)}% • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'nocollateral':
+                        meta = `Bez zástavy • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'lowrating':
+                        meta = `Rating ${item.rating} • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'overframe':
+                        meta = `+${formatCurrency(item.diff)} nad rámec • ${formatCurrency(item.uver)}`;
+                        break;
+                    case 'framefull':
+                        meta = `Čerpáno ${item.pct.toFixed(1)} % rámce (${formatCurrency(item.value)} z ${formatCurrency(item.ramec)})`;
+                        break;
+                    case 'prolonged':
+                        meta = `${item.prodlouzeni}× prodlouženo • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'pohledavka':
+                        meta = `Pohledávka: ${formatCurrency(item.pohledavka)} • Úvěr: ${formatCurrency(item.value)}`;
+                        break;
+                    case 'preplatek':
+                        meta = `Přeplatek: ${formatCurrency(item.preplatek)} • Úvěr: ${formatCurrency(item.value)}`;
+                        break;
+                    case 'dopredne':
+                        meta = `Úvěr: ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'predplacene':
+                        meta = `${item.prepaidMonths} měs. • Úvěr: ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'lowbank':
+                        meta = `Rozdíl: ${formatCurrency(item.rozdil)} (účet: ${formatCurrency(item.bankAccountBalance)}, přeplatek: ${formatCurrency(item.preplatek)})`;
+                        break;
+                    case 'anomaly':
+                        meta = `Jistina ${formatCurrency(item.aktualniJistina)} > úvěr ${formatCurrency(item.value)}`;
+                        break;
+                    case 'concentration':
+                        meta = `${item.share.toFixed(1)} % portfolia • ${item.pocet} úvěrů • ${formatCurrency(item.value)}`;
+                        break;
+                    case 'quality':
+                        meta = `Chybí: ${item.missing} • ${formatCurrency(item.value)}`;
+                        break;
+                    case 'exporterror':
+                        meta = escapeHtml(item.error || 'neznámá chyba');
+                        break;
+                    case 'trend':
+                        meta = escapeHtml(item.text || '');
+                        break;
+                    default:
+                        meta = formatCurrency(item.value);
                 }
+
+                return `<div class="alert-item"><span class="alert-item-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>${statusBadge}<span class="alert-item-meta">${meta}</span></div>`;
             }).join('');
         }
 
@@ -1447,6 +1822,8 @@
                 <div class="chart-card"><h3 class="chart-title">💰 Výše úvěru – objem (mld. Kč)</h3><div class="chart-container"><canvas id="loanSizeValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📅 Splatnost nesplacených – počet</h3><div class="chart-container"><canvas id="maturityCountChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">💵 Splatnost nesplacených – objem (mld. Kč)</h3><div class="chart-container"><canvas id="maturityValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">⏰ Po splatnosti – aging (počet)</h3><div class="chart-container"><canvas id="agingCountChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">⏰ Po splatnosti – aging (objem, mil. Kč)</h3><div class="chart-container"><canvas id="agingValueChart"></canvas></div></div>
             `;
 
             // 1. Rating – počet úvěrů
@@ -1560,18 +1937,32 @@
                 type: 'line', data: { labels: maturityData.map(m => m.month), datasets: [{ label: 'Objem (mld. Kč)', data: maturityData.map(m => m['Výše úvěru (Kč)'] / 1e9), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } } } }
             });
+
+            // 16. + 17. Aging úvěrů po splatnosti (počet / objem) - čím déle, tím tmavší červená
+            const aging = DATA.overdue_aging;
+            const agingColors = ['rgba(245, 158, 11, 0.8)', 'rgba(249, 115, 22, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(220, 38, 38, 0.85)', 'rgba(153, 27, 27, 0.9)'];
+
+            overviewCharts.agingCount = new Chart(document.getElementById('agingCountChart'), {
+                type: 'bar', data: { labels: aging.map(a => a.range), datasets: [{ label: 'Počet', data: aging.map(a => a.count), backgroundColor: agingColors, borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
+            });
+
+            overviewCharts.agingValue = new Chart(document.getElementById('agingValueChart'), {
+                type: 'bar', data: { labels: aging.map(a => a.range), datasets: [{ label: 'Objem (mil. Kč)', data: aging.map(a => a.value / 1e6), backgroundColor: agingColors, borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
+            });
         }
 
         function populateFilters() {
-            DATA.filters.typy.forEach(t => { document.getElementById('filterType').innerHTML += `<option value="${t}">${t}</option>`; });
-            DATA.filters.ratings.forEach(r => {
-                document.getElementById('filterRating').innerHTML += `<option value="${r}">${r}</option>`;
-                document.getElementById('filterRatingTranche').innerHTML += `<option value="${r}">${r}</option>`;
-            });
-            DATA.filters.stavy.forEach(s => {
-                document.getElementById('filterStatus').innerHTML += `<option value="${s}">${s}</option>`;
-                document.getElementById('filterStatusTranche').innerHTML += `<option value="${s}">${s}</option>`;
-            });
+            const buildOptions = values => values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+            const typeOptions = buildOptions(DATA.filters.typy);
+            const ratingOptions = buildOptions(DATA.filters.ratings);
+            const statusOptions = buildOptions(DATA.filters.stavy);
+            document.getElementById('filterType').insertAdjacentHTML('beforeend', typeOptions);
+            document.getElementById('filterRating').insertAdjacentHTML('beforeend', ratingOptions);
+            document.getElementById('filterRatingTranche').insertAdjacentHTML('beforeend', ratingOptions);
+            document.getElementById('filterStatus').insertAdjacentHTML('beforeend', statusOptions);
+            document.getElementById('filterStatusTranche').insertAdjacentHTML('beforeend', statusOptions);
         }
 
         function applyFilters() {
@@ -1659,9 +2050,9 @@
                     const typeClass = item.typ === 'Jednorázový' ? 'jednorazovy' : item.typ === 'Tranšový' ? 'transovy' : '';
 
                     return `<tr>
-                        <td class="cell-name" title="${item.jmeno}">${item.jmeno}</td>
-                        <td class="cell-owner" title="${item.vlastnik || ''}">${item.vlastnik || '-'}</td>
-                        <td><span class="badge badge-type ${typeClass}">${item.typ || '-'}</span></td>
+                        <td class="cell-name" title="${escapeHtml(item.jmeno)}">${escapeHtml(item.jmeno)}</td>
+                        <td class="cell-owner" title="${escapeHtml(item.vlastnik || '')}">${escapeHtml(item.vlastnik) || '-'}</td>
+                        <td><span class="badge badge-type ${typeClass}">${escapeHtml(item.typ) || '-'}</span></td>
                         <td class="cell-number">${item.tranches_count || 1}</td>
                         <td><span class="badge badge-rating ${ratingClass}">${item.rating || '-'}</span></td>
                         <td class="cell-number">${formatPercent(ltv)} ${ltvBar}</td>
@@ -1740,7 +2131,7 @@
                     const ltvClass = ltv > 75 ? 'high' : ltv > 65 ? 'medium' : '';
                     const ltvBar = ltv !== null ? `<span class="ltv-bar"><span class="ltv-fill ${ltvClass}" style="width: ${Math.min(ltv, 100)}%"></span></span>` : '';
                     return `<tr>
-                        <td class="cell-name" title="${item.jmeno}">${item.jmeno}</td>
+                        <td class="cell-name" title="${escapeHtml(item.jmeno)}">${escapeHtml(item.jmeno)}</td>
                         <td class="cell-number">${item.cislo_transe || '-'}</td>
                         <td><span class="badge badge-rating ${ratingClass}">${item.rating || '-'}</span></td>
                         <td class="cell-number">${formatPercent(ltv)} ${ltvBar}</td>
@@ -1782,7 +2173,7 @@
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, y: { grid: { display: false }, ticks: { color: chartColors.tickColor, font: { size: 10 } } } } }
             });
 
-            document.getElementById('ownersTableBody').innerHTML = ownerData.map(o => `<tr><td class="cell-name">${o.vlastnik}</td><td class="cell-number">${o.count}</td><td class="cell-number">${formatCurrency(o.value)}</td><td class="cell-number">${formatCurrency(o.value / o.count)}</td></tr>`).join('');
+            document.getElementById('ownersTableBody').innerHTML = ownerData.map(o => `<tr><td class="cell-name" title="${escapeHtml(o.vlastnik)}">${escapeHtml(o.vlastnik)}</td><td class="cell-number">${o.count}</td><td class="cell-number">${formatCurrency(o.value)}</td><td class="cell-number">${formatCurrency(o.value / o.count)}</td></tr>`).join('');
         }
 
         function setupEventListeners() {
@@ -1795,8 +2186,9 @@
                 });
             });
 
-            ['searchInput', 'filterType', 'filterRating', 'filterStatus', 'filterLTV', 'filterProblems'].forEach(id => {
-                document.getElementById(id).addEventListener('input', applyFilters);
+            // Textové pole s debounce, selecty jen na change (aby filtr neběžel 2× ani při každém stisku klávesy)
+            document.getElementById('searchInput').addEventListener('input', debounce(applyFilters, 200));
+            ['filterType', 'filterRating', 'filterStatus', 'filterLTV', 'filterProblems'].forEach(id => {
                 document.getElementById(id).addEventListener('change', applyFilters);
             });
 
@@ -1814,8 +2206,8 @@
                 applyFilters();
             });
 
-            ['searchInputTranche', 'filterRatingTranche', 'filterStatusTranche', 'filterLTVTranche'].forEach(id => {
-                document.getElementById(id).addEventListener('input', applyFiltersTranche);
+            document.getElementById('searchInputTranche').addEventListener('input', debounce(applyFiltersTranche, 200));
+            ['filterRatingTranche', 'filterStatusTranche', 'filterLTVTranche'].forEach(id => {
                 document.getElementById(id).addEventListener('change', applyFiltersTranche);
             });
 
