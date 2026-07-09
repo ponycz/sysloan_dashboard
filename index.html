@@ -1808,20 +1808,20 @@
 
             document.getElementById('chartsGrid').innerHTML = `
                 <div class="chart-card"><h3 class="chart-title">📊 Rating – počet úvěrů</h3><div class="chart-container"><canvas id="ratingCountChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">💰 Rating – objem (mld. Kč)</h3><div class="chart-container"><canvas id="ratingValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💰 Rating – objem (mil. Kč)</h3><div class="chart-container"><canvas id="ratingValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📉 Rating – průměrné LTV (%)</h3><div class="chart-container"><canvas id="avgLtvChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📈 LTV – počet úvěrů</h3><div class="chart-container"><canvas id="ltvCountChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">💵 LTV – objem (mld. Kč)</h3><div class="chart-container"><canvas id="ltvValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💵 LTV – objem (mil. Kč)</h3><div class="chart-container"><canvas id="ltvValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📊 Počet tranší na úvěr</h3><div class="chart-container"><canvas id="tranchesDistChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">🔄 Typ úvěru – počet</h3><div class="chart-container"><canvas id="typeCountChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">💰 Typ úvěru – objem (mld. Kč)</h3><div class="chart-container"><canvas id="typeValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💰 Typ úvěru – objem (mil. Kč)</h3><div class="chart-container"><canvas id="typeValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">👥 Počet vlastníků na úvěr</h3><div class="chart-container"><canvas id="ownersPerLoanChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">✅ Stav splacení – počet</h3><div class="chart-container"><canvas id="statusCountChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">💵 Stav splacení – objem (mld. Kč)</h3><div class="chart-container"><canvas id="statusValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💵 Stav splacení – objem (mil. Kč)</h3><div class="chart-container"><canvas id="statusValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📊 Výše úvěru – počet úvěrů</h3><div class="chart-container"><canvas id="loanSizeCountChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">💰 Výše úvěru – objem (mld. Kč)</h3><div class="chart-container"><canvas id="loanSizeValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💰 Výše úvěru – objem (mil. Kč)</h3><div class="chart-container"><canvas id="loanSizeValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">📅 Splatnost nesplacených – počet</h3><div class="chart-container"><canvas id="maturityCountChart"></canvas></div></div>
-                <div class="chart-card"><h3 class="chart-title">💵 Splatnost nesplacených – objem (mld. Kč)</h3><div class="chart-container"><canvas id="maturityValueChart"></canvas></div></div>
+                <div class="chart-card"><h3 class="chart-title">💵 Splatnost nesplacených – objem (mil. Kč)</h3><div class="chart-container"><canvas id="maturityValueChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">⏰ Po splatnosti – aging (počet)</h3><div class="chart-container"><canvas id="agingCountChart"></canvas></div></div>
                 <div class="chart-card"><h3 class="chart-title">⏰ Po splatnosti – aging (objem, mil. Kč)</h3><div class="chart-container"><canvas id="agingValueChart"></canvas></div></div>
             `;
@@ -1842,7 +1842,7 @@
 
             // 2. Rating – objem
             overviewCharts.ratingValue = new Chart(document.getElementById('ratingValueChart'), {
-                type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Objem (mld. Kč)', data: ratingStatsSorted.map(r => r['Výše úvěru (Kč)'] / 1e9), backgroundColor: ratingColors, borderRadius: 6 }] },
+                type: 'bar', data: { labels: ratingStatsSorted.map(r => r.Rating), datasets: [{ label: 'Objem (mil. Kč)', data: ratingStatsSorted.map(r => r['Výše úvěru (Kč)'] / 1e6), backgroundColor: ratingColors, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
@@ -1862,7 +1862,7 @@
 
             // 5. LTV – objem
             overviewCharts.ltvValue = new Chart(document.getElementById('ltvValueChart'), {
-                type: 'bar', data: { labels: ltvDist.map(d => d.range), datasets: [{ label: 'Objem (mld. Kč)', data: ltvDist.map(d => d.value / 1e9), backgroundColor: ltvColors, borderRadius: 6 }] },
+                type: 'bar', data: { labels: ltvDist.map(d => d.range), datasets: [{ label: 'Objem (mil. Kč)', data: ltvDist.map(d => d.value / 1e6), backgroundColor: ltvColors, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
@@ -1881,7 +1881,7 @@
 
             // 8. Typ úvěru – objem
             overviewCharts.typeValue = new Chart(document.getElementById('typeValueChart'), {
-                type: 'doughnut', data: { labels: typeStats.map(t => t['Typ úvěru']), datasets: [{ data: typeStats.map(t => t['Výše úvěru (Kč)'] / 1e9), backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
+                type: 'doughnut', data: { labels: typeStats.map(t => t['Typ úvěru']), datasets: [{ data: typeStats.map(t => t['Výše úvěru (Kč)'] / 1e6), backgroundColor: ['#3b82f6', '#8b5cf6'], borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
             });
 
@@ -1901,7 +1901,7 @@
 
             // 11. Stav splacení – objem
             overviewCharts.statusValue = new Chart(document.getElementById('statusValueChart'), {
-                type: 'doughnut', data: { labels: statusStats.map(s => s['Stav splacení']), datasets: [{ data: statusStats.map(s => s['Výše úvěru (Kč)'] / 1e9), backgroundColor: ['#ef4444', '#10b981'], borderWidth: 0 }] },
+                type: 'doughnut', data: { labels: statusStats.map(s => s['Stav splacení']), datasets: [{ data: statusStats.map(s => s['Výše úvěru (Kč)'] / 1e6), backgroundColor: ['#ef4444', '#10b981'], borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#8888a0' } } } }
             });
 
@@ -1918,7 +1918,7 @@
 
             // 13. Výše úvěru – objem
             overviewCharts.loanSizeValue = new Chart(document.getElementById('loanSizeValueChart'), {
-                type: 'bar', data: { labels: loanSizeDist.map(d => d.range), datasets: [{ label: 'Objem (mld. Kč)', data: loanSizeDist.map(d => d.value / 1e9), backgroundColor: loanSizeColors, borderRadius: 6 }] },
+                type: 'bar', data: { labels: loanSizeDist.map(d => d.range), datasets: [{ label: 'Objem (mil. Kč)', data: loanSizeDist.map(d => d.value / 1e6), backgroundColor: loanSizeColors, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
             });
 
@@ -1934,7 +1934,7 @@
 
             // 15. Splatnost nesplacených – objem
             overviewCharts.maturityValue = new Chart(document.getElementById('maturityValueChart'), {
-                type: 'line', data: { labels: maturityData.map(m => m.month), datasets: [{ label: 'Objem (mld. Kč)', data: maturityData.map(m => m['Výše úvěru (Kč)'] / 1e9), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
+                type: 'line', data: { labels: maturityData.map(m => m.month), datasets: [{ label: 'Objem (mil. Kč)', data: maturityData.map(m => m['Výše úvěru (Kč)'] / 1e6), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4, pointRadius: 3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } } } }
             });
 
