@@ -644,7 +644,11 @@
                     velikost_zastavy: loan.zastava || 0,
                     aktualniJistina: loan.aktualniJistina,
                     uver_nad_ramec: loan.vyse_uveru > loan.vyse_ramec && loan.vyse_ramec > 0,
-                    preplatek: loan.advancesBalance || 0
+                    preplatek: loan.advancesBalance || 0,
+                    utpActive: loan.utpActive === true,
+                    accelerationDate: loan.accelerationDate || null,
+                    ancillaryChargesStopDate: loan.ancillaryChargesStopDate || null,
+                    autoPairingDisabled: loan.autoPairingDisabled === true
                 };
             });
             
@@ -858,6 +862,81 @@
                 });
             }
             
+            // Nepravděpodobné splacení (UTP - unlikely to pay)
+            const utpLoans = loans.filter(l => l.utpActive);
+            if (utpLoans.length > 0) {
+                insights.push({
+                    type: 'danger',
+                    kind: 'utp',
+                    title: '🚨 Nepravděpodobné splacení (UTP)',
+                    count: utpLoans.length,
+                    value: utpLoans.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: utpLoans.sort((a, b) => (b.vyse_uveru || 0) - (a.vyse_uveru || 0)).map(l => ({
+                        name: l.jmeno,
+                        date: l.datum_splatnosti,
+                        value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
+            // Zesplatněné úvěry (accelerationDate - úvěr byl zesplatněn k danému datu)
+            const accelerated = loans.filter(l => l.accelerationDate);
+            if (accelerated.length > 0) {
+                insights.push({
+                    type: 'danger',
+                    kind: 'accelerated',
+                    title: '🚨 Zesplatněné úvěry',
+                    count: accelerated.length,
+                    value: accelerated.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: accelerated.sort((a, b) => String(a.accelerationDate).localeCompare(String(b.accelerationDate))).map(l => ({
+                        name: l.jmeno,
+                        date: formatDate(l.accelerationDate),
+                        value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
+            // Zastavené načítání příslušenství (ancillaryChargesStopDate)
+            const ancillaryStopped = loans.filter(l => l.ancillaryChargesStopDate);
+            if (ancillaryStopped.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    kind: 'ancillarystop',
+                    title: '⚠️ Zastaveno načítání příslušenství',
+                    count: ancillaryStopped.length,
+                    value: ancillaryStopped.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: ancillaryStopped.sort((a, b) => String(a.ancillaryChargesStopDate).localeCompare(String(b.ancillaryChargesStopDate))).map(l => ({
+                        name: l.jmeno,
+                        date: formatDate(l.ancillaryChargesStopDate),
+                        value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
+            // Deaktivované automatické párování plateb
+            const autoPairingOff = loans.filter(l => l.autoPairingDisabled);
+            if (autoPairingOff.length > 0) {
+                insights.push({
+                    type: 'warning',
+                    kind: 'autopairing',
+                    title: '⚠️ Deaktivované automatické párování plateb',
+                    count: autoPairingOff.length,
+                    value: autoPairingOff.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                    items: autoPairingOff.sort((a, b) => (b.vyse_uveru || 0) - (a.vyse_uveru || 0)).map(l => ({
+                        name: l.jmeno,
+                        value: l.vyse_uveru,
+                        aktualniJistina: l.aktualniJistina,
+                        stav_splaceni: l.stav_splaceni
+                    }))
+                });
+            }
+
             // Splatnost do 30 dní (nesplacené)
             const soon30 = loans.filter(l => l.stav_splaceni === 'Nesplaceno' && l.days_to_maturity !== null && l.days_to_maturity >= 0 && l.days_to_maturity <= 30);
             if (soon30.length > 0) {
@@ -1527,6 +1606,14 @@
                             </select>
                         </div>
                         <div class="filter-group">
+                            <label class="filter-label">UTP</label>
+                            <select class="filter-select" id="filterUTP" style="min-width: 110px;">
+                                <option value="">Vše</option>
+                                <option value="ano">Ano</option>
+                                <option value="ne">Ne</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
                             <label class="filter-label">Filtr</label>
                             <select class="filter-select" id="filterProblems">
                                 <option value="">Vše</option>
@@ -1541,6 +1628,9 @@
                                 <option value="dopredne">Dopředné úroky</option>
                                 <option value="standardni">Standardní úroky</option>
                                 <option value="predplacene">Předplacené úroky</option>
+                                <option value="accelerated">Zesplatněno</option>
+                                <option value="ancillarystop">Zastaveno načítání příslušenství</option>
+                                <option value="autopairing">Deaktivované párování plateb</option>
                             </select>
                         </div>
                         <div class="filter-spacer"></div>
@@ -1714,6 +1804,18 @@
                         break;
                     case 'due':
                         meta = `${item.date} (za ${item.days} dní) • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'utp':
+                        meta = `${item.date ? 'Splatnost ' + item.date + ' • ' : ''}${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'accelerated':
+                        meta = `Zesplatněno ${item.date} • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'ancillarystop':
+                        meta = `Zastaveno od ${item.date} • ${formatCurrency(item.value)}${jistinaInfo}`;
+                        break;
+                    case 'autopairing':
+                        meta = `Párování vypnuto • ${formatCurrency(item.value)}${jistinaInfo}`;
                         break;
                     case 'highltv':
                         meta = `LTV ${item.ltv.toFixed(1)}% • ${formatCurrency(item.value)}${jistinaInfo}`;
@@ -1971,6 +2073,7 @@
             const rating = document.getElementById('filterRating').value;
             const status = document.getElementById('filterStatus').value;
             const ltv = document.getElementById('filterLTV').value;
+            const utp = document.getElementById('filterUTP').value;
             const problems = document.getElementById('filterProblems').value;
 
             filteredData = DATA.loans.filter(item => {
@@ -1983,6 +2086,8 @@
                     if (ltv === 'medium' && (item.ltv_uveru === null || item.ltv_uveru <= 60 || item.ltv_uveru > 75)) return false;
                     if (ltv === 'high' && (item.ltv_uveru === null || item.ltv_uveru <= 75)) return false;
                 }
+                if (utp === 'ano' && !item.utpActive) return false;
+                if (utp === 'ne' && item.utpActive) return false;
                 if (problems) {
                     if (problems === 'overdue' && (item.days_to_maturity === null || item.days_to_maturity >= 0 || item.stav_splaceni === 'Splaceno')) return false;
                     if (problems === 'soon30' && (item.days_to_maturity === null || item.days_to_maturity < 0 || item.days_to_maturity > 30 || item.stav_splaceni === 'Splaceno')) return false;
@@ -1995,6 +2100,9 @@
                     if (problems === 'dopredne' && item.interestType !== 'PeriodStart') return false;
                     if (problems === 'standardni' && item.interestType !== 'PeriodEnd') return false;
                     if (problems === 'predplacene' && (!item.prepaidInterestPeriodInMonths || item.prepaidInterestPeriodInMonths < 1)) return false;
+                    if (problems === 'accelerated' && !item.accelerationDate) return false;
+                    if (problems === 'ancillarystop' && !item.ancillaryChargesStopDate) return false;
+                    if (problems === 'autopairing' && !item.autoPairingDisabled) return false;
                 }
                 return true;
             });
@@ -2035,6 +2143,10 @@
                     if (item.ltv_uveru > 75) problems.push(`<span class="badge badge-warning">LTV ${item.ltv_uveru.toFixed(0)}%</span>`);
                     if (item.uver_nad_ramec) problems.push(`<span class="badge badge-warning">Nad rámec</span>`);
                     if (item.prodlouzeni) problems.push(`<span class="badge badge-info">Prodl. ${item.prodlouzeni}×</span>`);
+                    if (item.utpActive) problems.push(`<span class="badge badge-warning">UTP</span>`);
+                    if (item.accelerationDate) problems.push(`<span class="badge badge-warning">Zesplatněno</span>`);
+                    if (item.ancillaryChargesStopDate) problems.push(`<span class="badge badge-caution">Přísl. zastaveno</span>`);
+                    if (item.autoPairingDisabled) problems.push(`<span class="badge badge-caution">Párování vyp.</span>`);
 
                     const ratingClass = (item.rating || '').startsWith('A') ? 'a' : (item.rating || '').startsWith('B') ? 'b' : 'c';
                     const statusClass = item.stav_splaceni === 'Splaceno' ? 'splaceno' : 'nesplaceno';
@@ -2188,12 +2300,12 @@
 
             // Textové pole s debounce, selecty jen na change (aby filtr neběžel 2× ani při každém stisku klávesy)
             document.getElementById('searchInput').addEventListener('input', debounce(applyFilters, 200));
-            ['filterType', 'filterRating', 'filterStatus', 'filterLTV', 'filterProblems'].forEach(id => {
+            ['filterType', 'filterRating', 'filterStatus', 'filterLTV', 'filterUTP', 'filterProblems'].forEach(id => {
                 document.getElementById(id).addEventListener('change', applyFilters);
             });
 
             document.getElementById('resetFilters').addEventListener('click', () => {
-                ['searchInput', 'filterType', 'filterRating', 'filterStatus', 'filterLTV', 'filterProblems'].forEach(id => document.getElementById(id).value = '');
+                ['searchInput', 'filterType', 'filterRating', 'filterStatus', 'filterLTV', 'filterUTP', 'filterProblems'].forEach(id => document.getElementById(id).value = '');
                 sortColumn = null; sortDirection = 'asc';
                 applyFilters();
             });
