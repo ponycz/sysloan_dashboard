@@ -460,7 +460,7 @@
             
             // Překreslit grafy s novými barvami
             if (DATA) {
-                const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+                const statusFilter = document.getElementById('filterOverviewStatus')?.value || '';
                 renderOverviewCharts(statusFilter);
                 updateOwnersChart();
             }
@@ -727,8 +727,10 @@
                 { 'Stav splacení': 'Splaceno', 'Loan ID': splaceno.length, 'Výše úvěru (Kč)': stats.splaceno_value }
             ];
             
-            // Distribuce tranší (pouze úvěry s datem splatnosti)
-            const tranchesDist = calculateTrancheDistribution(loansWithDate);
+            // Distribuce tranší (pouze úvěry s datem splatnosti) - varianty pro filtr
+            const tranchesDistAll = calculateTrancheDistribution(loansWithDate);
+            const tranchesDistSplaceno = calculateTrancheDistribution(splaceno);
+            const tranchesDistNesplaceno = calculateTrancheDistribution(nesplaceno);
             
             // Měsíční splatnosti (nesplacené)
             const monthly = calculateMonthlyMaturity(nesplaceno);
@@ -738,8 +740,10 @@
             const ownerStatsSplaceno = calculateOwnerStats(splaceno);
             const ownerStatsNesplaceno = calculateOwnerStats(nesplaceno);
             
-            // Distribuce počtu vlastníků na úvěr (pouze úvěry s datem splatnosti)
-            const ownersPerLoanDist = calculateOwnersPerLoanDistribution(loansWithDate);
+            // Distribuce počtu vlastníků na úvěr (pouze úvěry s datem splatnosti) - varianty pro filtr
+            const ownersPerLoanDistAll = calculateOwnersPerLoanDistribution(loansWithDate);
+            const ownersPerLoanDistSplaceno = calculateOwnersPerLoanDistribution(splaceno);
+            const ownersPerLoanDistNesplaceno = calculateOwnersPerLoanDistribution(nesplaceno);
             
             // Distribuce výše úvěrů (pouze úvěry s datem splatnosti)
             const loanSizeDistAll = calculateLoanSizeDistribution(loansWithDate);
@@ -766,13 +770,17 @@
                 ltv_distribution_splaceno: ltvDistSplaceno,
                 ltv_distribution_nesplaceno: ltvDistNesplaceno,
                 status_stats: statusStats,
-                tranches_distribution: tranchesDist,
+                tranches_distribution_all: tranchesDistAll,
+                tranches_distribution_splaceno: tranchesDistSplaceno,
+                tranches_distribution_nesplaceno: tranchesDistNesplaceno,
                 overdue_aging: overdueAging,
                 monthly,
                 owner_stats_all: ownerStatsAll,
                 owner_stats_splaceno: ownerStatsSplaceno,
                 owner_stats_nesplaceno: ownerStatsNesplaceno,
-                owners_per_loan_distribution: ownersPerLoanDist,
+                owners_per_loan_distribution_all: ownersPerLoanDistAll,
+                owners_per_loan_distribution_splaceno: ownersPerLoanDistSplaceno,
+                owners_per_loan_distribution_nesplaceno: ownersPerLoanDistNesplaceno,
                 loan_size_distribution_all: loanSizeDistAll,
                 loan_size_distribution_splaceno: loanSizeDistSplaceno,
                 loan_size_distribution_nesplaceno: loanSizeDistNesplaceno,
@@ -1887,22 +1895,28 @@
 
         function renderOverviewCharts(statusFilter) {
             const chartColors = getChartColors();
-            let ratingStats, typeStats, ltvDist, loanSizeDist;
+            let ratingStats, typeStats, ltvDist, loanSizeDist, tranchesDistData, ownersPerLoanDistData;
             if (statusFilter === 'splaceno') {
                 ratingStats = DATA.rating_stats_splaceno;
                 typeStats = DATA.type_stats_splaceno;
                 ltvDist = DATA.ltv_distribution_splaceno;
                 loanSizeDist = DATA.loan_size_distribution_splaceno;
+                tranchesDistData = DATA.tranches_distribution_splaceno;
+                ownersPerLoanDistData = DATA.owners_per_loan_distribution_splaceno;
             } else if (statusFilter === 'nesplaceno') {
                 ratingStats = DATA.rating_stats_nesplaceno;
                 typeStats = DATA.type_stats_nesplaceno;
                 ltvDist = DATA.ltv_distribution_nesplaceno;
                 loanSizeDist = DATA.loan_size_distribution_nesplaceno;
+                tranchesDistData = DATA.tranches_distribution_nesplaceno;
+                ownersPerLoanDistData = DATA.owners_per_loan_distribution_nesplaceno;
             } else {
                 ratingStats = DATA.rating_stats_all;
                 typeStats = DATA.type_stats_all;
                 ltvDist = DATA.ltv_distribution_all;
                 loanSizeDist = DATA.loan_size_distribution_all;
+                tranchesDistData = DATA.tranches_distribution_all;
+                ownersPerLoanDistData = DATA.owners_per_loan_distribution_all;
             }
 
             Object.values(overviewCharts).forEach(c => c && c.destroy());
@@ -1969,7 +1983,7 @@
             });
 
             // 6. Počet tranší na úvěr
-            const tranchesDist = DATA.tranches_distribution;
+            const tranchesDist = tranchesDistData || [];
             overviewCharts.tranchesDist = new Chart(document.getElementById('tranchesDistChart'), {
                 type: 'bar', data: { labels: tranchesDist.map(d => d.tranches + ' tranš' + (d.tranches === 1 ? 'e' : d.tranches < 5 ? 'e' : 'í')), datasets: [{ label: 'Počet úvěrů', data: tranchesDist.map(d => d.count), backgroundColor: 'rgba(139, 92, 246, 0.7)', borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
@@ -1988,7 +2002,7 @@
             });
 
             // 9. Počet vlastníků na úvěr
-            const ownersPerLoanDist = DATA.owners_per_loan_distribution;
+            const ownersPerLoanDist = ownersPerLoanDistData || [];
             overviewCharts.ownersPerLoan = new Chart(document.getElementById('ownersPerLoanChart'), {
                 type: 'bar', data: { labels: ownersPerLoanDist.map(d => d.owners + ' vlastník' + (d.owners === 1 ? '' : d.owners < 5 ? 'y' : 'ů')), datasets: [{ label: 'Počet úvěrů', data: ownersPerLoanDist.map(d => d.count), backgroundColor: 'rgba(6, 182, 212, 0.7)', borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.tickColor } }, x: { grid: { display: false }, ticks: { color: chartColors.tickColor } } } }
