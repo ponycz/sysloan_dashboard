@@ -684,6 +684,9 @@
             const ltvValues = loansWithDate.filter(l => l.ltv_uveru !== null).map(l => l.ltv_uveru);
             const avgLtv = ltvValues.length > 0 ? ltvValues.reduce((a, b) => a + b, 0) / ltvValues.length : 0;
             
+            // Součet aktuální jistiny (bezpečný proti null/undefined)
+            const sumJistina = (arr) => arr.reduce((sum, l) => sum + (l.aktualniJistina || 0), 0);
+
             const stats = {
                 total_loans: aggregatedLoans.length,
                 total_loans_with_date: loansWithDate.length,
@@ -696,8 +699,10 @@
                 splaceno_value: splaceno.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
                 nesplaceno_count: nesplaceno.length,
                 nesplaceno_value: nesplaceno.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                nesplaceno_jistina: sumJistina(nesplaceno),
                 overdue_count: overdue.length,
-                overdue_value: overdue.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0)
+                overdue_value: overdue.reduce((sum, l) => sum + (l.vyse_uveru || 0), 0),
+                overdue_jistina: sumJistina(overdue)
             };
             
             // Generovat insights/alerts (ty mohou obsahovat i úvěry bez data)
@@ -1743,7 +1748,8 @@
 
         function renderStats() {
             const stats = DATA.stats;
-            const overduePct = stats.total_value > 0 ? (stats.overdue_value / stats.total_value * 100) : 0;
+            // % podíl po splatnosti se počítá z aktuální jistiny všech nesplacených úvěrů
+            const overduePct = stats.nesplaceno_jistina > 0 ? (stats.overdue_jistina / stats.nesplaceno_jistina * 100) : 0;
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card"><div class="stat-label">Úvěrů (s datem)</div><div class="stat-value">${formatNumber(stats.total_loans_with_date)}</div><div class="stat-sub">z ${formatNumber(stats.total_loans)} celkem</div></div>
                 <div class="stat-card"><div class="stat-label">Celkem tranší</div><div class="stat-value">${formatNumber(stats.total_tranches)}</div><div class="stat-sub">všechny tranše</div></div>
@@ -1751,8 +1757,8 @@
                 <div class="stat-card"><div class="stat-label">Velikost zástav</div><div class="stat-value">${(stats.total_collateral / 1e9).toFixed(2)}</div><div class="stat-sub">mld. Kč</div></div>
                 <div class="stat-card"><div class="stat-label">Průměrné LTV</div><div class="stat-value">${stats.avg_ltv.toFixed(1)}%</div><div class="stat-sub">Loan-to-Value</div></div>
                 <div class="stat-card success"><div class="stat-label">Splaceno</div><div class="stat-value success">${formatNumber(stats.splaceno_count)}</div><div class="stat-sub">${formatCurrency(stats.splaceno_value)}</div></div>
-                <div class="stat-card warning"><div class="stat-label">Nesplaceno</div><div class="stat-value warning">${formatNumber(stats.nesplaceno_count)}</div><div class="stat-sub">${formatCurrency(stats.nesplaceno_value)}</div></div>
-                <div class="stat-card danger"><div class="stat-label">Po splatnosti</div><div class="stat-value danger">${formatNumber(stats.overdue_count)}</div><div class="stat-sub">${formatCurrency(stats.overdue_value)} • ${overduePct.toFixed(1)} % objemu</div></div>
+                <div class="stat-card warning"><div class="stat-label">Nesplaceno</div><div class="stat-value warning">${formatNumber(stats.nesplaceno_count)}</div><div class="stat-sub">${formatCurrency(stats.nesplaceno_jistina)} <span style="opacity:.6">(akt. jistina)</span></div></div>
+                <div class="stat-card danger"><div class="stat-label">Po splatnosti</div><div class="stat-value danger">${formatNumber(stats.overdue_count)}</div><div class="stat-sub">${formatCurrency(stats.overdue_jistina)} <span style="opacity:.6">(akt. jistina)</span> • ${overduePct.toFixed(1)} % z nespl.</div></div>
             `;
         }
 
