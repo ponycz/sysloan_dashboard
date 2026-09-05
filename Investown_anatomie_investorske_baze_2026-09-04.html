@@ -1,0 +1,1370 @@
+<title>Anatomie investorské báze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,500;0,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#F6F7F9; --surface:#FFFFFF; --surface-2:#EEF1F5;
+  --ink:#131C29; --slate:#55657A; --faint:#7F8DA0;
+  --rule:#DCE2EA; --rule-strong:#C3CCD8;
+  --accent:#0F6BAE; --accent-soft:#E4EEF7; --warm:#C2662B;
+  --good:#0F7A3D; --warn:#B8791A; --crit:#B03A2E;
+  --a1:#8AB2CE; --a2:#6699BA; --a3:#457FA4; --a4:#29668C; --a5:#134D73; --a6:#083654;
+  --shadow:0 1px 2px rgba(19,28,41,.05), 0 8px 24px -12px rgba(19,28,41,.18);
+  --measure:66ch;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#111823; --surface:#18212F; --surface-2:#1E2938;
+    --ink:#E8EDF3; --slate:#9AA9BC; --faint:#7A8798;
+    --rule:#27323F; --rule-strong:#39465A;
+    --accent:#4A94D2; --accent-soft:#1B2B3D; --warm:#D4762F;
+    --good:#3EA968; --warn:#D2A045; --crit:#D9695C;
+    --a1:#CFE3F1; --a2:#ABC9DF; --a3:#87AECC; --a4:#6492B6; --a5:#43769D; --a6:#265B82;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#111823; --surface:#18212F; --surface-2:#1E2938;
+  --ink:#E8EDF3; --slate:#9AA9BC; --faint:#7A8798;
+  --rule:#27323F; --rule-strong:#39465A;
+  --accent:#4A94D2; --accent-soft:#1B2B3D; --warm:#D4762F;
+  --good:#3EA968; --warn:#D2A045; --crit:#D9695C;
+  --a1:#CFE3F1; --a2:#ABC9DF; --a3:#87AECC; --a4:#6492B6; --a5:#43769D; --a6:#265B82;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);
+  font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px 96px}
+.col{max-width:var(--measure)}
+p{margin:0 0 1.05em}
+a{color:var(--accent)}
+strong{font-weight:600}
+
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:500}
+h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;text-wrap:balance;margin:0}
+h1{font-size:clamp(38px,5.4vw,62px);line-height:1.04;letter-spacing:-.018em}
+h2{font-size:clamp(26px,3.2vw,36px);line-height:1.14;letter-spacing:-.012em}
+h3{font-size:20px;line-height:1.3;font-weight:600;letter-spacing:-.005em}
+.num{font-variant-numeric:tabular-nums}
+
+header.masthead{padding:60px 0 34px;border-bottom:1px solid var(--rule-strong)}
+.mast-meta{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;margin-bottom:26px}
+.mast-meta .dot{color:var(--rule-strong)}
+.standfirst{font-size:19px;line-height:1.58;color:var(--slate);margin-top:22px;max-width:60ch}
+.standfirst b{color:var(--ink);font-weight:600}
+
+.verdict{margin:34px 0 0;padding:22px 24px;background:var(--surface);
+  border:1px solid var(--rule);border-left:3px solid var(--accent);box-shadow:var(--shadow)}
+.verdict h3{margin-bottom:8px}
+.verdict p{margin-bottom:0;color:var(--slate)}
+.verdict p+p{margin-top:.7em}
+
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);margin:44px 0 0}
+.fig{background:var(--paper);padding:16px 18px 15px}
+.fig .v{font-family:Newsreader,Georgia,serif;font-size:29px;line-height:1.1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.fig .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);margin-top:7px}
+.fig .s{font-size:12.5px;color:var(--slate);margin-top:3px;line-height:1.4}
+
+.body-grid{display:block}
+@media(min-width:1080px){
+  .body-grid{display:grid;grid-template-columns:1fr 186px;gap:56px;align-items:start}
+  .rail{position:sticky;top:28px;padding-top:70px;display:block}
+}
+.rail{display:none}
+.rail ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--rule)}
+.rail a{display:block;padding:6px 0 6px 13px;margin-left:-1px;border-left:2px solid transparent;
+  font-size:12.5px;line-height:1.35;color:var(--faint);text-decoration:none}
+.rail a:hover{color:var(--ink)}
+.rail a.on{color:var(--ink);border-left-color:var(--accent);font-weight:500}
+.rail .rn{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--rule-strong);display:block}
+.rail a.on .rn{color:var(--accent)}
+
+section{padding-top:62px}
+.sec-head{display:flex;gap:16px;align-items:baseline;margin-bottom:6px}
+.sec-n{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+  color:var(--accent);letter-spacing:.06em;flex:none;padding-top:.35em}
+.lede{font-size:17.5px;color:var(--slate);margin:14px 0 26px;max-width:62ch;line-height:1.55}
+
+.find{border:1px solid var(--rule);background:var(--surface);padding:20px 22px;
+  margin:26px 0;box-shadow:var(--shadow)}
+.find.warnbox{border-left:3px solid var(--warn)}
+.find.critbox{border-left:3px solid var(--crit)}
+.find.goodbox{border-left:3px solid var(--good)}
+.find.factbox{border-left:3px solid var(--accent)}
+.find > .eyebrow{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.find h3{margin-bottom:9px}
+.find p:last-child{margin-bottom:0}
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;
+  padding:3px 8px;border:1px solid currentColor}
+.badge.w{color:var(--warn)} .badge.c{color:var(--crit)}
+.badge.g{color:var(--good)} .badge.a{color:var(--accent)}
+.ico{width:11px;height:11px;flex:none}
+
+.tblwrap{overflow-x:auto;margin:26px 0;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+caption{text-align:left;padding:13px 16px 12px;border-bottom:1px solid var(--rule);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);background:var(--surface-2)}
+th,td{padding:8px 16px;text-align:right;border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums}
+td:not(:first-child){white-space:nowrap}
+th:first-child,td:first-child{text-align:left;font-variant-numeric:normal}
+thead th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--faint);font-weight:500;vertical-align:bottom;
+  border-bottom:1px solid var(--rule-strong)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.tot td{font-weight:600;background:var(--surface-2);border-top:1px solid var(--rule-strong)}
+td.pos,b.pos{color:var(--good)} td.neg,b.neg{color:var(--crit)}
+.swatch{display:inline-block;width:9px;height:9px;margin-right:8px;vertical-align:baseline;flex:none}
+
+figure{margin:30px 0;border:1px solid var(--rule);background:var(--surface);box-shadow:var(--shadow)}
+figcaption{padding:14px 18px 0;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.fignote{padding:0 18px 14px;font-size:12.5px;color:var(--slate);line-height:1.45;
+  margin-top:5px;max-width:76ch}
+.chartbox{padding:6px 10px 12px;position:relative}
+svg.chart{display:block;width:100%;height:auto;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:0 18px 14px;font-size:12px;color:var(--slate)}
+.legend span{display:inline-flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+.tt{position:absolute;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--ink);color:var(--paper);padding:7px 10px;font-size:12px;line-height:1.45;
+  white-space:nowrap;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.25);font-variant-numeric:tabular-nums}
+.tt b{font-weight:600}
+.tt .r{display:flex;justify-content:space-between;gap:14px}
+.twoup{display:grid;gap:22px}
+@media(min-width:860px){.twoup{grid-template-columns:1fr 1fr}}
+.twoup figure{margin:0}
+
+.actions{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);margin:30px 0}
+.act{background:var(--surface);padding:19px 22px;display:grid;grid-template-columns:auto 1fr;gap:0 18px}
+.act .pri{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
+  letter-spacing:.06em;color:var(--accent);padding-top:.3em;grid-row:span 2}
+.act h3{margin-bottom:6px}
+.act p{margin:0;color:var(--slate);font-size:14.5px}
+.act .meta{margin-top:9px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  letter-spacing:.04em;color:var(--faint);display:flex;flex-wrap:wrap;gap:4px 16px}
+.act .meta b{color:var(--slate);font-weight:500}
+footer{margin-top:74px;padding-top:26px;border-top:1px solid var(--rule-strong);
+  font-size:13px;color:var(--faint)}
+footer p{max-width:78ch}
+code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--surface-2);
+  padding:1px 5px;border:1px solid var(--rule)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media(max-width:620px){
+  .wrap{padding:0 18px 70px}
+  .sec-head{gap:11px}
+  table{font-size:12.5px}
+  th,td{padding:7px 11px}
+}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="mast-meta eyebrow">
+    <span>Investown&nbsp;· interní analýza</span><span class="dot">/</span>
+    <span>řez dat 4.&nbsp;9.&nbsp;2026</span><span class="dot">/</span>
+    <span>138&nbsp;838 účtů</span><span class="dot">/</span>
+    <span>+ Snowflake: spend a nabídka</span><span class="dot">/</span>
+    <span>agregovaná data, bez PII</span>
+  </div>
+  <h1>Anatomie investorské báze</h1>
+  <p class="standfirst">
+    Kdo se u nás registruje, kdo z toho investuje a kolik — a jestli za zpomalením tempa
+    investic stojí <b>měnící se věková skladba uživatelů</b>. Na tu poslední otázku je
+    odpověď ne. Data ukazují na něco jiného a horšího.
+  </p>
+
+  <div class="verdict">
+    <h3>Závěr napřed</h3>
+    <p>
+      Báze stárne — medián věku při registraci vyrostl z 29&nbsp;let (2022) na 37&nbsp;let (2026).
+      Pro objem je to ale <b>příznivé</b>: starší registrace přinášejí násobně větší portfolia.
+      Kdyby se nezměnilo nic jiného než věk, očekávaný objem na jednu registraci by dnes byl
+      <b>o&nbsp;14,1&nbsp;% vyšší</b>. Věk zpomalení nevysvětluje.
+    </p>
+    <p>
+      Prostupnost funnelu se prakticky nezměnila. Pokles nových investorů je <b>téměř celý
+      v&nbsp;objemu registrací</b> — a ten má dvě různé příčiny za sebou. V roce 2025 to bylo
+      <b>vědomé škrcení marketingu</b> (spend spadl na 22&nbsp;% předchozí úrovně) a&nbsp;bylo
+      efektivní: cena za nového investora tehdy dokonce <b>klesla</b>. V roce 2026 už to
+      neplatí: spend je zpět a v okně březen–srpen byl dokonce <b>o&nbsp;9,0&nbsp;% vyšší než ve
+      stejném okně 2024</b> — ale registrací přišlo <b>o&nbsp;44,8&nbsp;% méně</b>.
+    </p>
+    <p>
+      Většina toho rozdílu ale <b>není zdražení akvizice, nýbrž přesun rozpočtu</b>. Od jara 2026
+      míří velká část performance rozpočtu na <b>B2B — získávání developerů</b> kvůli nabídce
+      úvěrů, a ten B2C registrace z principu nepřináší. Po odečtení odhadovaného B2B vychází
+      B2C rozpočet <b>−44,2&nbsp;%</b> a registrace <b>−44,8&nbsp;%</b>:
+      <b>liší se o 0,7&nbsp;p.&nbsp;b.</b> Registrací ubylo prakticky přesně v poměru
+      k B2C rozpočtu.
+    </p>
+    <p>
+      Skutečné zdražení B2C akvizice je řádově menší. Na čistě B2C kanálu <b>referral</b>
+      (existující investoři doporučují známé — žádné B2B v něm být nemůže) vyšla cena za
+      registraci <b>+29,8&nbsp;%</b> a za nového investora <b>+25,0&nbsp;%</b>. Reálný problém
+      to je, ale je to zhruba čtvrtina, ne dvojnásobek — a hlavně jde o rozhodnutí o alokaci,
+      ne o selhání kanálů.
+    </p>
+  </div>
+
+  <div class="figs">
+    <div class="fig"><div class="v num">138 838</div><div class="k">registrovaných účtů</div><div class="s">po vyřazení 595 falešných</div></div>
+    <div class="fig"><div class="v num">40 378</div><div class="k">investorů</div><div class="s">29,1&nbsp;% báze</div></div>
+    <div class="fig"><div class="v num">6,38 mld</div><div class="k">Kč v portfoliích</div><div class="s">aktuální stav</div></div>
+    <div class="fig"><div class="v num">−44,2 %</div><div class="k">B2C rozpočet</div><div class="s">při −44,8&nbsp;% registrací</div></div>
+    <div class="fig"><div class="v num">2 058</div><div class="k">lidí drží 50 % objemu</div><div class="s">5,1&nbsp;% investorů</div></div>
+    <div class="fig"><div class="v num">+29,8 %</div><div class="k">dražší B2C registrace</div><div class="s">měřeno na referralu</div></div>
+    <div class="fig"><div class="v num">+14,1 %</div><div class="k">efekt stárnutí báze</div><div class="s">na hodnotu registrace</div></div>
+  </div>
+</header>
+
+<div class="body-grid">
+<main>
+
+<!-- ============ 01 ============ -->
+<section id="s1">
+  <div class="sec-head"><span class="sec-n">01</span><h2>Falešné účty a kvalita dat</h2></div>
+  <p class="lede">Než se cokoli počítá, je potřeba vyřadit hackerský útok z&nbsp;ledna 2025
+  a&nbsp;popsat, co dalšího je v&nbsp;datech rozbité.</p>
+
+  <div class="find critbox">
+    <div class="eyebrow"><span class="badge c"><svg class="ico" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1L11.2 10.5H0.8z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 4.6v2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="8.9" r=".75" fill="currentColor"/></svg>Vyřazeno z analýzy</span></div>
+    <h3>595 falešných účtů z 30. ledna 2025</h3>
+    <p>
+      Registrace 30.&nbsp;1.&nbsp;2025 s&nbsp;datem narození 3.&nbsp;8.&nbsp;1940. <b>Všech 595 má stav
+      <code>InProgress</code>, úroveň <code>starter</code>, nulové investice a&nbsp;žádnou
+      založenou peněženku</b> — 594 uvedlo CZ, jeden AF. Ten den bylo celkem 702 registrací
+      proti běžným 85–120 v&nbsp;okolních dnech. Podle zadání jde o&nbsp;hackerský útok; v&nbsp;této
+      analýze jsou <b>zcela vyřazené</b>, báze je proto 138&nbsp;838 místo 139&nbsp;433 účtů.
+    </p>
+    <p>
+      Nezávislé potvrzení počtu: Snowflake vykazuje za leden 2025 <b>4&nbsp;064 registrací</b>,
+      očištěný export <b>3&nbsp;469</b>. Rozdíl je přesně <b>595</b>. Ty účty se tedy dostaly
+      i&nbsp;do platformních metrik — <b>doporučuji je vyřadit i&nbsp;ve Snowflake</b>, jinak budou
+      navždy nadhodnocovat leden 2025 v&nbsp;každém meziročním srovnání akvizice.
+    </p>
+    <p>
+      Čtyři další účty se stejným datem narození z&nbsp;listopadu 2024 se útoku netýkají
+      (jeden je ověřený a&nbsp;investuje 57&nbsp;106&nbsp;Kč) a&nbsp;v&nbsp;datech zůstávají.
+    </p>
+  </div>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Kvalita pole „datum narození" — 138 838 účtů po očištění</caption>
+      <thead><tr><th>Kategorie</th><th>Účtů</th><th>Podíl</th><th>Z toho investuje</th><th>Kč v portfoliích</th></tr></thead>
+      <tbody>
+        <tr><td>Platný věk</td><td class="num">112 096</td><td class="num">80,74 %</td><td class="num">40 209</td><td class="num">6 367 355 471</td></tr>
+        <tr><td>Datum chybí</td><td class="num">24 241</td><td class="num">17,46 %</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>Mladší 18 let při registraci</td><td class="num">1 597</td><td class="num">1,15 %</td><td class="num">169</td><td class="num">8 683 921</td></tr>
+        <tr><td>Starší 99 let</td><td class="num">895</td><td class="num">0,64 %</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>Záporný věk (narození v budoucnu)</td><td class="num">9</td><td class="num">0,01 %</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr class="tot"><td>Celkem</td><td class="num">138 838</td><td class="num">100,00 %</td><td class="num">40 378</td><td class="num">6 376 039 392</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="find warnbox">
+    <div class="eyebrow"><span class="badge w"><svg class="ico" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6 3.2v3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="8.6" r=".75" fill="currentColor"/></svg>Pro compliance</span></div>
+    <h3>169 účtů investovalo s&nbsp;datem narození, podle kterého jim při registraci nebylo 18</h3>
+    <p>
+      Dohromady 8,68&nbsp;mil.&nbsp;Kč (0,14&nbsp;% objemu), medián portfolia 10&nbsp;772&nbsp;Kč,
+      registrace 2021–2025. <b>164 z&nbsp;nich prošlo KYC do stavu <code>Verified</code></b> — buď
+      je datum chybné, nebo ověření nekontrolovalo věk v&nbsp;okamžiku registrace. Aktuální
+      expozice je nulová: <b>ani jeden není dnes nezletilý</b> (nejmladšímu 18, medián 21).
+      Nejpravděpodobnější vysvětlení je překlep v&nbsp;roce narození, kvalifikované posouzení
+      ale patří compliance, ne této analýze.
+    </p>
+  </div>
+
+  <div class="find goodbox">
+    <div class="eyebrow"><span class="badge g"><svg class="ico" viewBox="0 0 12 12" aria-hidden="true"><path d="M1.6 6.4l2.9 2.9L10.4 3.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Kontrola sedí</span></div>
+    <h3>Datum narození je tvrdá brána</h3>
+    <p>
+      Z&nbsp;24&nbsp;241 účtů bez data narození <b>neinvestoval ani jeden</b> a&nbsp;<b>žádný nemá
+      zůstatek v&nbsp;peněžence</b>. Zbylých 904 nesmyslných záznamů (nad 99&nbsp;let, záporný věk)
+      neinvestovalo také nic a&nbsp;žádný neprošel ověřením — KYC se zachovalo správně.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 02 ============ -->
+<section id="s2">
+  <div class="sec-head"><span class="sec-n">02</span><h2>Báze dnes</h2></div>
+  <p class="lede">Ze 138&nbsp;838 registrací je 40&nbsp;378 investorů. Peníze jsou v&nbsp;nich rozložené
+  mimořádně nerovnoměrně.</p>
+
+  <figure>
+    <figcaption>Funnel od registrace k investici</figcaption>
+    <div class="chartbox"><svg class="chart" id="chH" role="img" aria-label="Funnel: 138 838 registrací, 114 597 vyplnilo datum narození, 57 225 ověřeno, 38 238 ověřených investuje"></svg><div class="tt" id="ttH"></div></div>
+    <p class="fignote">Stav k&nbsp;4.&nbsp;9.&nbsp;2026, ne historický průchod: účet ověřený v&nbsp;2021 dnes může být ve stavu vyžadujícím re-verifikaci. Poslední krok zůstává uvnitř skupiny <code>Verified</code>, aby poměry nemíchaly populace — <b>investorů napříč všemi stavy je 40&nbsp;378</b>, rozdíl 2&nbsp;140 jsou hlavně účty čekající na re-verifikaci.</p>
+  </figure>
+
+  <p class="col">
+    Poslední krok je zdravý: <b>66,8&nbsp;% ověřených uživatelů investuje</b>. Úzké hrdlo je
+    jednoznačně před produktem — mezi registrací a&nbsp;dokončeným ověřením odpadne 59&nbsp;% lidí.
+  </p>
+
+  <div class="twoup">
+    <figure>
+      <figcaption>Koncentrace portfolií</figcaption>
+      <div class="chartbox"><svg class="chart" id="chI" role="img" aria-label="Lorenzova křivka rozdělení portfolií mezi investory"></svg><div class="tt" id="ttI"></div></div>
+      <p class="fignote">Lorenzova křivka. Úhlopříčka = dokonalá rovnost. Gini 0,775.</p>
+    </figure>
+    <figure>
+      <figcaption>Úrovně účtu: podíl účtů vs. podíl objemu</figcaption>
+      <div class="chartbox"><svg class="chart" id="chJ" role="img" aria-label="Porovnání podílu účtů a podílu objemu podle úrovně účtu"></svg><div class="tt" id="ttJ"></div></div>
+      <div class="legend" id="lgJ"></div>
+    </figure>
+  </div>
+
+  <div class="find factbox">
+    <h3>5,1 % investorů drží polovinu objemu</h3>
+    <p>
+      Polovinu z&nbsp;6,38&nbsp;mld.&nbsp;Kč drží <b>2 058&nbsp;lidí</b>. Top&nbsp;1&nbsp;% (404&nbsp;osob) drží
+      22,1&nbsp;%, top&nbsp;5&nbsp;% drží 49,6&nbsp;%, top&nbsp;10&nbsp;% drží 65,2&nbsp;%. Medián portfolia investora
+      je 34&nbsp;420&nbsp;Kč, průměr 157&nbsp;909&nbsp;Kč. <b>1&nbsp;% účtů na úrovni premium&nbsp;4 drží
+      41,2&nbsp;% všech peněz.</b>
+    </p>
+    <p>
+      Provozně: objem je citlivý na chování několika stovek lidí. Odchod dvou set velkých
+      investorů se v&nbsp;číslech projeví víc než odchod dvaceti tisíc malých — a&nbsp;každá akvizice,
+      která nepřivede budoucího velkého investora, je pro objem téměř neviditelná.
+    </p>
+  </div>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Úrovně účtu — kde jsou peníze</caption>
+      <thead><tr><th>Úroveň</th><th>Účtů</th><th>Podíl účtů</th><th>Objem (mil. Kč)</th><th>Podíl objemu</th><th>Medián portfolia</th><th>Medián věku</th></tr></thead>
+      <tbody>
+        <tr><td>starter</td><td class="num">109 889</td><td class="num">79,15 %</td><td class="num">43,5</td><td class="num">0,68 %</td><td class="num">3 000</td><td class="num">35</td></tr>
+        <tr><td>active</td><td class="num">10 941</td><td class="num">7,88 %</td><td class="num">259,8</td><td class="num">4,07 %</td><td class="num">21 163</td><td class="num">35</td></tr>
+        <tr><td>premium 1</td><td class="num">10 441</td><td class="num">7,52 %</td><td class="num">1 026,4</td><td class="num">16,10 %</td><td class="num">88 981</td><td class="num">38</td></tr>
+        <tr><td>premium 2</td><td class="num">4 461</td><td class="num">3,21 %</td><td class="num">1 303,9</td><td class="num">20,45 %</td><td class="num">273 896</td><td class="num">42</td></tr>
+        <tr><td>premium 3</td><td class="num">1 707</td><td class="num">1,23 %</td><td class="num">1 118,4</td><td class="num">17,54 %</td><td class="num">615 206</td><td class="num">45</td></tr>
+        <tr><td>premium 4</td><td class="num">1 399</td><td class="num">1,01 %</td><td class="num">2 624,1</td><td class="num">41,16 %</td><td class="num">1 408 217</td><td class="num">48</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="col">
+    Medián věku roste s&nbsp;každou úrovní monotónně — z&nbsp;35 na 48&nbsp;let. První náznak toho,
+    co potvrdí sekce&nbsp;04.
+  </p>
+
+  <div class="find">
+    <div class="eyebrow">Peněženky · geografie · právnické osoby</div>
+    <p>
+      <b>V peněženkách leží jen 208,2&nbsp;mil.&nbsp;Kč</b> při mediánu zůstatku 504&nbsp;Kč. Zpomalení
+      tedy <b>není</b> tím, že by lidé měli nabito a&nbsp;neinvestovali. Výjimkou je 267&nbsp;investorů
+      se zůstatkem nad 100&nbsp;tis.&nbsp;Kč, kteří drží 69,7&nbsp;mil.&nbsp;Kč hotovosti proti
+      342,8&nbsp;mil.&nbsp;Kč v&nbsp;portfoliích (20,3&nbsp;% jejich portfolia).
+    </p>
+    <p>
+      Geograficky jsme <b>čistě česká platforma</b>: CZ&nbsp;+&nbsp;SK dělá 98,5&nbsp;% objemu.
+      Slovensko má 3&nbsp;039&nbsp;účtů, ale konverzi na investora jen 21,2&nbsp;% proti 34,3&nbsp;%
+      v&nbsp;Česku. <b>Právnických osob je 276</b> (1,5&nbsp;% objemu), ale s&nbsp;průměrným portfoliem
+      865&nbsp;596&nbsp;Kč — <b>5,6× nad fyzickými osobami</b>. Marginální počtem, nejlepší poměr
+      hodnoty na účet v&nbsp;celé bázi.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 03 ============ -->
+<section id="s3">
+  <div class="sec-head"><span class="sec-n">03</span><h2>Jak se mění věk registrujících</h2></div>
+  <p class="lede">Přímá odpověď na otázku ze zadání. Věk počítám k&nbsp;okamžiku registrace,
+  ne k&nbsp;dnešku — jinak by každá kohorta „stárla" jen tím, že plyne čas.</p>
+
+  <figure>
+    <figcaption>Věková skladba při registraci, po čtvrtletích</figcaption>
+    <div class="chartbox"><svg class="chart" id="chB" role="img" aria-label="Podíl věkových skupin na registracích po čtvrtletích, 2022 až 2026"></svg><div class="tt" id="ttB"></div></div>
+    <div class="legend" id="lgB"></div>
+    <p class="fignote">Podíl v&nbsp;%, jen registrace s&nbsp;platným datem narození. Čtvrtletí s&nbsp;méně než 100 záznamy vynechána. 2026·Q3 obsahuje jen červenec–4.&nbsp;září.</p>
+  </figure>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Posledních 6 měsíců (3–9/2026) proti všemu staršímu</caption>
+      <thead><tr><th>Věk při registraci</th><th>Do 2/2026</th><th>3–9/2026</th><th>Změna</th></tr></thead>
+      <tbody>
+        <tr><td><span class="swatch" style="background:var(--a1)"></span>18–24</td><td class="num">24,28 %</td><td class="num">23,18 %</td><td class="num neg">−1,10 p. b.</td></tr>
+        <tr><td><span class="swatch" style="background:var(--a2)"></span>25–34</td><td class="num">32,73 %</td><td class="num">23,61 %</td><td class="num neg">−9,12 p. b.</td></tr>
+        <tr><td><span class="swatch" style="background:var(--a3)"></span>35–44</td><td class="num">21,41 %</td><td class="num">21,65 %</td><td class="num pos">+0,24 p. b.</td></tr>
+        <tr><td><span class="swatch" style="background:var(--a4)"></span>45–54</td><td class="num">13,80 %</td><td class="num">17,98 %</td><td class="num pos">+4,17 p. b.</td></tr>
+        <tr><td><span class="swatch" style="background:var(--a5)"></span>55–64</td><td class="num">5,24 %</td><td class="num">9,28 %</td><td class="num pos">+4,04 p. b.</td></tr>
+        <tr><td><span class="swatch" style="background:var(--a6)"></span>65+</td><td class="num">2,54 %</td><td class="num">4,30 %</td><td class="num pos">+1,76 p. b.</td></tr>
+        <tr class="tot"><td>Medián věku / N</td><td class="num">32 let &nbsp;·&nbsp; 108 886</td><td class="num">36 let &nbsp;·&nbsp; 3 210</td><td class="num">+4 roky</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="col">
+    Posun je dlouhodobý. Medián věku při registraci: <b>34&nbsp;let (2021) → 29 (2022) → 31 (2023)
+    → 34 (2024) → 35 (2025) → 37 (2026)</b>. Skupina 25–34, historicky největší zdroj registrací,
+    ztratila za poslední půlrok 9,1&nbsp;p.&nbsp;b. Skupiny 45–54 a&nbsp;55–64 získaly dohromady 8,2.
+  </p>
+
+  <figure>
+    <figcaption>Absolutní počty registrací podle věku a roku</figcaption>
+    <div class="chartbox"><svg class="chart" id="chN" role="img" aria-label="Absolutní počty registrací podle věkové skupiny a roku registrace"></svg><div class="tt" id="ttN"></div></div>
+    <div class="legend" id="lgN"></div>
+    <p class="fignote">2026 je neúplný rok (do 4.&nbsp;září). Skupiny stojí vedle sebe, ne na sobě — jde o&nbsp;absolutní počty, ne podíly.</p>
+  </figure>
+
+  <div class="find warnbox">
+    <div class="eyebrow"><span class="badge w"><svg class="ico" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6 3.2v3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="8.6" r=".75" fill="currentColor"/></svg>Pozor na čtení</span></div>
+    <h3>Nepřišli starší. Odešli mladí.</h3>
+    <p>
+      Podíly svádějí k&nbsp;závěru „daří se nám oslovovat starší". V&nbsp;absolutních počtech je to
+      jinak — mezi 2024 a&nbsp;2025 <b>ubylo ve všech věkových skupinách bez výjimky</b>:
+      18–24 o&nbsp;44,4&nbsp;%, 25–34 o&nbsp;46,0&nbsp;%, 35–44 o&nbsp;35,8&nbsp;%, 45–54 o&nbsp;33,5&nbsp;%,
+      55–64 o&nbsp;31,0&nbsp;%, 65+ o&nbsp;45,0&nbsp;%. Změna skladby je <b>důsledek nerovnoměrného
+      úbytku</b>, ne přílivu nové cílovky.
+    </p>
+  </div>
+
+  <div class="find">
+    <div class="eyebrow">Metodická výhrada</div>
+    <p>
+      Věk znám jen u&nbsp;lidí, kteří datum narození vyplnili. Kdyby mladší odpadali z&nbsp;onboardingu
+      systematicky víc, vypadala by čerstvá kohorta uměle starší. Na zralých kohortách 2021–2024
+      je rozdíl v&nbsp;dokončení mezi věkovými skupinami <b>12,7&nbsp;p.&nbsp;b.</b> a&nbsp;není monotónní
+      (nejlépe 45–54 s&nbsp;52,0&nbsp;%, nejhůř 65+ s&nbsp;39,4&nbsp;%, 18–24 má 44,9&nbsp;%). Efekt existuje
+      a&nbsp;působí k&nbsp;mírnému nadhodnocení starších, ale řádově menším než pozorovaný posun.
+      <b>Trend je reálný, jeho velikost může být mírně nadsazená.</b>
+    </p>
+  </div>
+</section>
+
+<!-- ============ 04 ============ -->
+<section id="s4">
+  <div class="sec-head"><span class="sec-n">04</span><h2>Vysvětluje věk zpomalení? Ne — pomáhá</h2></div>
+  <p class="lede">Test shift-share: kdyby se změnila jen věková skladba a&nbsp;chování každé
+  skupiny zůstalo stejné, jak by se změnila očekávaná hodnota jedné registrace?</p>
+
+  <div class="twoup">
+    <figure>
+      <figcaption>Očekávané portfolio z 1 registrace dle věku</figcaption>
+      <div class="chartbox"><svg class="chart" id="chC" role="img" aria-label="Očekávané portfolio na jednu registraci podle věkové skupiny"></svg><div class="tt" id="ttC"></div></div>
+      <p class="fignote">Zralé kohorty 2021–2024, průměr přes všechny registrace včetně těch, kdo nikdy neinvestovali.</p>
+    </figure>
+    <figure>
+      <figcaption>Podíl investorů vs. podíl objemu dle věku</figcaption>
+      <div class="chartbox"><svg class="chart" id="chP" role="img" aria-label="Porovnání podílu investorů a podílu objemu podle věkové skupiny"></svg><div class="tt" id="ttP"></div></div>
+      <div class="legend" id="lgP"></div>
+      <p class="fignote">Kde je oranžová delší než modrá, drží skupina víc peněz, než odpovídá jejímu počtu.</p>
+    </figure>
+  </div>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Hodnota registrace podle věku — a jak se skladba posunula</caption>
+      <thead><tr><th>Věk</th><th>Portfolio na registraci</th><th>Index (18–24 = 1)</th><th>Podíl registrací 2021–24</th><th>Podíl 3–9/2026</th></tr></thead>
+      <tbody>
+        <tr><td>18–24</td><td class="num">18 123 Kč</td><td class="num">1,00×</td><td class="num">24,68 %</td><td class="num">23,18 %</td></tr>
+        <tr><td>25–34</td><td class="num">38 966 Kč</td><td class="num">2,15×</td><td class="num">34,02 %</td><td class="num">23,61 %</td></tr>
+        <tr><td>35–44</td><td class="num">77 040 Kč</td><td class="num">4,25×</td><td class="num">21,30 %</td><td class="num">21,65 %</td></tr>
+        <tr><td>45–54</td><td class="num">117 036 Kč</td><td class="num">6,46×</td><td class="num">13,02 %</td><td class="num">17,98 %</td></tr>
+        <tr><td>55–64</td><td class="num">129 620 Kč</td><td class="num">7,15×</td><td class="num">4,71 %</td><td class="num">9,28 %</td></tr>
+        <tr><td>65+</td><td class="num">101 209 Kč</td><td class="num">5,58×</td><td class="num">2,28 %</td><td class="num">4,30 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="find goodbox">
+    <div class="eyebrow"><span class="badge g"><svg class="ico" viewBox="0 0 12 12" aria-hidden="true"><path d="M1.6 6.4l2.9 2.9L10.4 3.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Odpověď</span></div>
+    <h3>Věková skladba je pro objem tichý plus, ne minus</h3>
+    <p>
+      Při skladbě staršího období vychází <b>59&nbsp;167&nbsp;Kč</b> očekávaného portfolia na jednu
+      registraci, při skladbě posledních šesti měsíců <b>67&nbsp;503&nbsp;Kč</b>. To je
+      <b>+14,1&nbsp;%</b> čistě z&nbsp;posunu věku, +8&nbsp;337&nbsp;Kč na registraci. Kdyby zůstala
+      skladba z&nbsp;roku 2022, byl by propad objemu ještě hlubší.
+    </p>
+  </div>
+
+  <p class="col">
+    Souvislost věku a&nbsp;peněz je napříč daty konzistentní. Konverze ověřeného uživatele na
+    investora roste s&nbsp;věkem z&nbsp;53,4&nbsp;% (18–24) na 73,5&nbsp;% (55–64). Podíl investorů na
+    úrovni premium&nbsp;2 a&nbsp;výš roste z&nbsp;4,9&nbsp;% na 33,9&nbsp;%. Skupina 65+ tvoří 3,4&nbsp;%
+    investorů a&nbsp;drží 7,2&nbsp;% objemu; skupina 18–24 tvoří 11,6&nbsp;% a&nbsp;drží 3,3&nbsp;%.
+  </p>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Investoři podle věku dnes — počet vs. peníze</caption>
+      <thead><tr><th>Věk</th><th>Investorů</th><th>Podíl investorů</th><th>Podíl objemu</th><th>Poměr</th><th>Medián portfolia</th><th>Konverze Verified→investor</th></tr></thead>
+      <tbody>
+        <tr><td>18–24</td><td class="num">4 667</td><td class="num">11,6 %</td><td class="num">3,3 %</td><td class="num">0,28</td><td class="num">12 000</td><td class="num">53,4 %</td></tr>
+        <tr><td>25–34</td><td class="num">12 428</td><td class="num">30,9 %</td><td class="num">17,2 %</td><td class="num">0,56</td><td class="num">23 376</td><td class="num">66,1 %</td></tr>
+        <tr><td>35–44</td><td class="num">10 482</td><td class="num">26,1 %</td><td class="num">27,0 %</td><td class="num">1,04</td><td class="num">44 639</td><td class="num">69,0 %</td></tr>
+        <tr><td>45–54</td><td class="num">7 905</td><td class="num">19,7 %</td><td class="num">31,6 %</td><td class="num">1,61</td><td class="num">62 288</td><td class="num">72,8 %</td></tr>
+        <tr><td>55–64</td><td class="num">3 368</td><td class="num">8,4 %</td><td class="num">13,7 %</td><td class="num">1,64</td><td class="num">65 436</td><td class="num">73,5 %</td></tr>
+        <tr><td>65+</td><td class="num">1 359</td><td class="num">3,4 %</td><td class="num">7,2 %</td><td class="num">2,14</td><td class="num">83 261</td><td class="num">70,6 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section id="s5">
+  <div class="sec-head"><span class="sec-n">05</span><h2>Co tedy klesá</h2></div>
+  <p class="lede">Když to není věk, zbývají tři možnosti: méně registrací, horší průchod
+  funnelem, nebo menší částky. Rozklad je jednoznačný.</p>
+
+  <figure>
+    <figcaption>Registrace po měsících</figcaption>
+    <div class="chartbox"><svg class="chart" id="chA" role="img" aria-label="Počet registrací po měsících od ledna 2023 do září 2026"></svg><div class="tt" id="ttA"></div></div>
+    <p class="fignote">Bez 595 falešných účtů z&nbsp;30.&nbsp;1.&nbsp;2025. Září 2026 je neúplné (do 4.&nbsp;9.) a&nbsp;je proto odlišeno.</p>
+  </figure>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Rozklad poklesu počtu nových investorů</caption>
+      <thead><tr><th>Faktor</th><th>9/2024–2/2025</th><th>9/2025–2/2026</th><th>Změna</th></tr></thead>
+      <tbody>
+        <tr><td>Registrací</td><td class="num">16 742</td><td class="num">10 201</td><td class="num neg">−39,1 %</td></tr>
+        <tr><td>× prošlo KYC</td><td class="num">48,2 %</td><td class="num">48,0 %</td><td class="num">−0,4 %</td></tr>
+        <tr><td>× KYC → investor</td><td class="num">65,7 %</td><td class="num">63,7 %</td><td class="num">−3,2 %</td></tr>
+        <tr class="tot"><td>= nových investorů</td><td class="num">5 304</td><td class="num">3 115</td><td class="num neg">−41,3 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="col">
+    <b>Prostupnost funnelu se prakticky nezměnila.</b> A je to ještě lepší, než to vypadá:
+    mladší kohorta měla k&nbsp;datu řezu jen ~9&nbsp;měsíců zralosti proti ~21&nbsp;u&nbsp;starší,
+    a&nbsp;přesto dosáhla stejného KYC&nbsp;% i&nbsp;téměř stejné konverze na investora. Při stejné
+    zralosti by na tom byla lépe. <b>Zbývá objem registrací</b> — a&nbsp;ten rozebírá sekce&nbsp;06.
+  </p>
+
+  <div class="find critbox">
+    <div class="eyebrow"><span class="badge c"><svg class="ico" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1L11.2 10.5H0.8z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 4.6v2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="8.9" r=".75" fill="currentColor"/></svg>Metrika lže</span></div>
+    <h3>„Dokončenost onboardingu spadla z 87 % na 36 %" — ta metrika od ledna 2026 neplatí</h3>
+    <p>
+      Vyplněnost data narození vypadá jako propad. Jenže se v&nbsp;lednu 2026 změnilo, <b>kdy</b>
+      se ten údaj sbírá. Důkaz: mezi lidmi, kteří <b>neprošli</b> ověřením, mělo datum narození
+      vyplněné <b>62,4&nbsp;%</b> registrovaných v&nbsp;2025 (n&nbsp;=&nbsp;7&nbsp;819), ale jen
+      <b>7,4&nbsp;%</b> registrovaných od února 2026 (n&nbsp;=&nbsp;4&nbsp;293). Pole se přesunulo
+      z&nbsp;místa <b>před</b> ověřením na místo <b>za&nbsp;ním</b>; mezera mezi oběma metrikami se
+      zavřela z&nbsp;~29&nbsp;p.&nbsp;b. na ~2&nbsp;p.&nbsp;b.
+    </p>
+    <p>
+      Zároveň se překlopil koncový stav: <code>NotVerified</code> spadl z&nbsp;12–22&nbsp;% na
+      3–5&nbsp;%, <code>InProgress</code> vyskočil z&nbsp;25–32&nbsp;% na 46–62&nbsp;%.
+      <b>Skutečný onboarding se přitom nezhoršil</b> (KYC rate −0,4&nbsp;%). Metriku doporučuji
+      překlopit na KYC&nbsp;rate a&nbsp;řadu k&nbsp;1.&nbsp;1.&nbsp;2026 přerušit.
+    </p>
+  </div>
+
+  <figure>
+    <figcaption>Kde se metrika rozešla s realitou</figcaption>
+    <div class="chartbox"><svg class="chart" id="chD" role="img" aria-label="Podíl registrací s vyplněným datem narození a podíl těch, kdo prošli KYC, po měsících"></svg><div class="tt" id="ttD"></div></div>
+    <div class="legend" id="lgD"></div>
+    <p class="fignote">Obě řady jsou podíly ze stejné měsíční kohorty. Do ledna 2026 běží s&nbsp;odstupem ~29&nbsp;p.&nbsp;b., pak splynou. Poslední měsíce mají nízkou zralost, obě řady u&nbsp;nich ještě porostou.</p>
+  </figure>
+</section>
+
+<!-- ============ 06 ============ -->
+<section id="s6">
+  <div class="sec-head"><span class="sec-n">06</span><h2>Marketing: škrcení, návrat a zdražení</h2></div>
+  <p class="lede">Data ze Snowflake (<code>CHANNEL_DAILY_METRICS</code>, jen atomické kanály).
+  Tady je odpověď na to, proč registrace nepřišly zpátky.</p>
+
+  <figure>
+    <figcaption>Marketingový spend po měsících</figcaption>
+    <div class="chartbox"><svg class="chart" id="chE" role="img" aria-label="Měsíční marketingový spend od ledna 2024 do srpna 2026"></svg><div class="tt" id="ttE"></div></div>
+    <p class="fignote">Součet přes atomické kanály (performance, user_referral, financial_advisor, affiliate). Předagregované kombinace v&nbsp;poli <code>CHANNEL</code> jsou vyloučené — jinak se spend počítá čtyřikrát.</p>
+  </figure>
+
+  <p class="col">
+    Škrcení i&nbsp;návrat jsou v&nbsp;datech přesně vidět a&nbsp;sedí na popis: průměr
+    2,43&nbsp;mil.&nbsp;Kč/měsíc v&nbsp;Q4&nbsp;2024 → dno <b>394&nbsp;894&nbsp;Kč v&nbsp;březnu 2025</b> →
+    průměr 535&nbsp;tis. v&nbsp;5–9/2025, tedy <b>22&nbsp;% předchozí úrovně</b>. Návrat v&nbsp;listopadu
+    2025 (2,59&nbsp;mil.) a&nbsp;prosinci (2,95&nbsp;mil.), pak stabilizace na
+    1,45&nbsp;mil./měsíc v&nbsp;3–8/2026 — <b>60&nbsp;% původní úrovně</b>.
+  </p>
+
+  <figure>
+    <figcaption>Cena za registraci a za nového investora</figcaption>
+    <div class="chartbox"><svg class="chart" id="chF" role="img" aria-label="Vývoj ceny za registraci a ceny za nového investora po měsících"></svg><div class="tt" id="ttF"></div></div>
+    <div class="legend" id="lgF"></div>
+    <p class="fignote">Spend dělený počtem registrací, resp. počtem nových investorů, v&nbsp;daném měsíci. Organické a&nbsp;direct registrace jsou ve jmenovateli též — jde o&nbsp;celkovou efektivitu, ne o&nbsp;cenu jednoho kanálu.</p>
+  </figure>
+
+  <div class="find factbox">
+    <h3>V roce 2026 utrácíme víc než v 2024 a dostáváme o 45 % méně registrací</h3>
+    <p>Stejné okno březen–srpen, aby seděla sezónnost. Toto je <b>celý</b> spend, tedy včetně
+    B2B — rozklad následuje hned za tabulkou a závěr podstatně mění.</p>
+  </div>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Efektivita akvizice, okno březen–srpen</caption>
+      <thead><tr><th>Rok</th><th>Spend</th><th>Registrací</th><th>Nových investorů</th><th>Kč / registraci</th><th>Kč / nového investora</th></tr></thead>
+      <tbody>
+        <tr><td>2024</td><td class="num">8 006 559</td><td class="num">11 495</td><td class="num">4 281</td><td class="num">697</td><td class="num">1 870</td></tr>
+        <tr><td>2025 (škrceno)</td><td class="num">3 747 899</td><td class="num">5 119</td><td class="num">3 009</td><td class="num">732</td><td class="num">1 246</td></tr>
+        <tr><td>2026</td><td class="num">8 726 762</td><td class="num">6 340</td><td class="num">2 116</td><td class="num">1 376</td><td class="num">4 124</td></tr>
+        <tr class="tot"><td>2026 vs 2024</td><td class="num">+9,0 %</td><td class="num neg">−44,8 %</td><td class="num neg">−50,6 %</td><td class="num neg">+97,6 %</td><td class="num neg">+120,5 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="col">
+    Rok 2025 nebyl selháním — při 47&nbsp;% rozpočtu byla cena za registraci prakticky stejná
+    (732 vs 697&nbsp;Kč) a&nbsp;cena za nového investora dokonce <b>nižší</b> (1&nbsp;246 vs
+    1&nbsp;870&nbsp;Kč). Škrcení bylo efektivní.
+  </p>
+
+  <h3 style="margin:34px 0 10px">Kolik z toho je B2B</h3>
+  <p class="col">
+    Od jara 2026 míří velká část performance rozpočtu na <b>získávání developerů</b>, aby
+    přibyla nabídka úvěrů. Ten spend z&nbsp;principu nevytváří investorské registrace, takže
+    dělit jím jejich počet cenu akvizice nadhodnocuje. Rozdělení B2C&nbsp;/&nbsp;B2B ale
+    <b>není v datech spolehlivě zaznamenané</b> (viz varování níže), proto počítám tři varianty.
+  </p>
+
+  <figure>
+    <figcaption>Rozdělení spendu na B2C a B2B</figcaption>
+    <div class="chartbox"><svg class="chart" id="chQ" role="img" aria-label="Měsíční marketingový spend rozdělený na B2C a B2B část"></svg><div class="tt" id="ttQ"></div></div>
+    <div class="legend" id="lgQ"></div>
+    <p class="fignote">Do 2/2026 podle sloupce <code>DAILY_SPEND_B2B</code>, od 3/2026 podle provozního odhadu: performance 75&nbsp;% B2B, referral a&nbsp;ostatní kanály 100&nbsp;% B2C.</p>
+  </figure>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Cena akvizice ve třech variantách přiřazení B2B, okno březen–srpen</caption>
+      <thead><tr><th>Varianta</th><th>Kč/reg 2024</th><th>Kč/reg 2025</th><th>Kč/reg 2026</th><th>Změna 26/24</th><th>Kč/investora 2026</th><th>Změna 26/24</th></tr></thead>
+      <tbody>
+        <tr><td>Celý spend (bez rozlišení)</td><td class="num">697</td><td class="num">732</td><td class="num">1 376</td><td class="num neg">+97,6 %</td><td class="num">4 128</td><td class="num neg">+120,6 %</td></tr>
+        <tr><td>Minus tagované B2B ze Snowflake</td><td class="num">677</td><td class="num">657</td><td class="num">1 290</td><td class="num neg">+90,4 %</td><td class="num">3 867</td><td class="num neg">+112,5 %</td></tr>
+        <tr class="tot"><td>Minus odhad B2B (performance 75 %)</td><td class="num">677</td><td class="num">657</td><td class="num">686</td><td class="num pos">+1,2 %</td><td class="num">2 056</td><td class="num neg">+13,0 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="find goodbox">
+    <div class="eyebrow"><span class="badge g"><svg class="ico" viewBox="0 0 12 12" aria-hidden="true"><path d="M1.6 6.4l2.9 2.9L10.4 3.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Oprava závěru</span></div>
+    <h3>Registrací ubylo přesně v poměru k B2C rozpočtu</h3>
+    <p>
+      Po odečtení odhadovaného B2B klesl B2C rozpočet mezi okny 3–8/2024 a&nbsp;3–8/2026
+      o&nbsp;<b>44,2&nbsp;%</b> (7&nbsp;786&nbsp;102&nbsp;→&nbsp;4&nbsp;346&nbsp;280&nbsp;Kč), zatímco
+      registrací ubylo o&nbsp;<b>44,8&nbsp;%</b>. <b>Rozdíl je 0,7&nbsp;p.&nbsp;b.</b> Cena za
+      registraci pak vychází +1,2&nbsp;%, tedy prakticky beze změny.
+    </p>
+    <p>
+      <b>Není to selhání akvizice, ale její vědomé zmenšení</b> ve prospěch nabídky. Cena za
+      nového <em>investora</em> přesto vzrostla o&nbsp;13,0&nbsp;% — ta část alokací vysvětlená není.
+    </p>
+  </div>
+
+  <figure>
+    <figcaption>Nezávislý test: cena registrace z referralu</figcaption>
+    <div class="chartbox"><svg class="chart" id="chS" role="img" aria-label="Cena za registraci z kanálu user referral po měsících"></svg><div class="tt" id="ttS"></div></div>
+    <p class="fignote">Kanál <code>user_referral</code> je z&nbsp;definice 100&nbsp;% B2C, takže u&nbsp;něj žádné dělení odhadem nepotřebuji. Měsíce s&nbsp;odměnovou kampaní (4/2025, 4/2026) jsou vidět jako špičky.</p>
+  </figure>
+
+  <p class="col">
+    Referral je nejčistší dostupný odhad, o&nbsp;kolik zdražila B2C akvizice, protože do něj B2B
+    nemůže zasahovat: <b>726&nbsp;→&nbsp;942&nbsp;Kč za registraci (+29,8&nbsp;%)</b> a&nbsp;<b>997&nbsp;→
+    1&nbsp;246&nbsp;Kč za nového investora (+25,0&nbsp;%)</b> mezi okny 3–8/2024 a&nbsp;3–8/2026.
+    Reálné zdražení B2C akvizice je tedy zhruba <b>čtvrtina až třetina</b>, ne dvojnásobek.
+  </p>
+
+  <figure>
+    <figcaption>Kanál performance: spend drží, registrace zmizely</figcaption>
+    <div class="chartbox"><svg class="chart" id="chR" role="img" aria-label="Spend a registrace kanálu performance indexované k průměru roku 2024"></svg><div class="tt" id="ttR"></div></div>
+    <div class="legend" id="lgR"></div>
+    <p class="fignote">Index, průměr 2024&nbsp;=&nbsp;100 (spend 1&nbsp;054&nbsp;546&nbsp;Kč/měsíc, 768&nbsp;registrací/měsíc).</p>
+  </figure>
+
+  <div class="find warnbox">
+    <div class="eyebrow"><span class="badge w"><svg class="ico" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6 3.2v3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="8.6" r=".75" fill="currentColor"/></svg>Datová mezera</span></div>
+    <h3>Sloupec <code>DAILY_SPEND_B2B</code> ten přesun nezachycuje</h3>
+    <p>
+      Nejsilnější důkaz přesměrování je chování samotného kanálu: v&nbsp;okně březen–srpen dal
+      performance <b>3&nbsp;420 registrací (2024) proti 490 (2026)</b>, tedy <b>−85,7&nbsp;%</b>,
+      a&nbsp;to při spendu <b>+13,3&nbsp;%</b>. Cena za registraci z&nbsp;performance tak formálně
+      vzrostla 1&nbsp;508&nbsp;→&nbsp;11&nbsp;920&nbsp;Kč, tedy <b>7,9×</b>. Žádný B2C kanál se takhle
+      nezhorší — takhle vypadá rozpočet, který míří jinam.
+    </p>
+    <p>
+      Tag to ale neukazuje: v&nbsp;březnu–červnu 2026 vykazuje <code>DAILY_SPEND_B2B</code> jen
+      <b>1,5–6,2&nbsp;%</b> performance rozpočtu a&nbsp;teprve v&nbsp;červenci (14,3&nbsp;%) a&nbsp;srpnu
+      (37,8&nbsp;%) roste. Že jde o&nbsp;mezeru v&nbsp;tagování, a&nbsp;ne o&nbsp;realitu, dokládá
+      i&nbsp;<b>sedm měsíců v&nbsp;řadě s&nbsp;přesnou nulou</b> (8/2024–2/2025).
+      <b>Dokud se tagování nespraví, nejde měřit návratnost ani jedné z&nbsp;obou stran.</b>
+    </p>
+  </div>
+
+  <figure>
+    <figcaption>Spend a registrace, indexováno k průměru 2024</figcaption>
+    <div class="chartbox"><svg class="chart" id="chG" role="img" aria-label="Marketingový spend a počet registrací indexované k průměru roku 2024"></svg><div class="tt" id="ttG"></div></div>
+    <div class="legend" id="lgG"></div>
+    <p class="fignote">Obě řady jako index, průměr 2024&nbsp;=&nbsp;100 (spend 1&nbsp;858&nbsp;773&nbsp;Kč/měsíc, registrace 2&nbsp;485/měsíc). Do konce 2025 se řady drží u&nbsp;sebe; od roku 2026 se rozevírají — stejné peníze, méně lidí.</p>
+  </figure>
+
+  <div class="tblwrap">
+    <table>
+      <caption>Párové srovnání měsíců s téměř shodným spendem</caption>
+      <thead><tr><th>Dvojice</th><th>Spend</th><th>Registrací</th><th>Nových investorů</th></tr></thead>
+      <tbody>
+        <tr><td>4/2024 → 4/2026</td><td class="num">1 758 325 → 1 789 720 <b>(+1,8 %)</b></td><td class="num">2 142 → 1 258 <b class="neg">(−41,3 %)</b></td><td class="num">805 → 532 <b class="neg">(−33,9 %)</b></td></tr>
+        <tr><td>5/2024 → 5/2026</td><td class="num">1 613 150 → 1 682 963 <b>(+4,3 %)</b></td><td class="num">1 806 → 1 295 <b class="neg">(−28,3 %)</b></td><td class="num">686 → 407 <b class="neg">(−40,7 %)</b></td></tr>
+        <tr><td>3/2024 → 3/2026</td><td class="num">1 660 234 → 1 399 643 <b>(−15,7 %)</b></td><td class="num">2 412 → 1 275 <b class="neg">(−47,1 %)</b></td><td class="num">931 → 471 <b class="neg">(−49,4 %)</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="col">
+    Tato analýza neříká <b>proč</b> akvizice zdražila — na to by byl potřeba rozpad po
+    kampaních, kreativách a&nbsp;aukčních cenách, který v&nbsp;datech není. Věrohodní kandidáti:
+    ztráta rozjetých kampaní a&nbsp;učících se algoritmů během osmiměsíční pauzy, dražší aukce,
+    nasycení publika, nebo změna atribuce. <b>Každý z&nbsp;nich se řeší jinak, takže to je první
+    věc k&nbsp;dohledání.</b>
+  </p>
+
+  <figure>
+    <figcaption>Strana nabídky: objem nově otevřených kol</figcaption>
+    <div class="chartbox"><svg class="chart" id="chK" role="img" aria-label="Objem nově otevřených investičních kol po měsících"></svg><div class="tt" id="ttK"></div></div>
+    <p class="fignote"><code>DAILY_METRICS.NEW_INVESTMENT_ROUNDS_AMOUNT</code>, měsíční součty v&nbsp;mil. Kč.</p>
+  </figure>
+
+  <p class="col">
+    Nabídka skutečně slábne, ale plynule, ne skokem: <b>286&nbsp;mil.&nbsp;Kč/měsíc (2024) →
+    260 (2025) → 217 (2026)</b>, tedy −24,1&nbsp;% proti 2024. Q4&nbsp;2024 bylo 354&nbsp;mil./měsíc,
+    leden 2025 už 270. To je zároveň důvod obou marketingových rozhodnutí — škrcení v&nbsp;2025
+    i&nbsp;přesunu na B2B v&nbsp;2026.
+  </p>
+  <p class="col">
+    <b>Zatím se to ale nabídce nevrátilo:</b> v&nbsp;červenci a&nbsp;srpnu 2026, kdy už B2B spend
+    poznatelně běžel, byla nová kola na 189 a&nbsp;202&nbsp;mil.&nbsp;Kč, tedy pod průměrem roku.
+    Na hodnocení je brzy — získání developera a&nbsp;doručení prvního projektu má dlouhou
+    průběžnou dobu — ale je to metrika, na kterou se má ten rozpočet měřit.
+  </p>
+
+  <figure>
+    <figcaption>Čistý tok peněženek: vklady mínus výběry</figcaption>
+    <div class="chartbox"><svg class="chart" id="chM" role="img" aria-label="Čistý měsíční tok peněz do platformy, vklady mínus výběry"></svg><div class="tt" id="ttM"></div></div>
+    <p class="fignote">V&nbsp;mil. Kč. Od května 2026 je čistý tok záporný čtyři měsíce v&nbsp;řadě, dohromady −217&nbsp;mil.&nbsp;Kč.</p>
+  </figure>
+
+  <p class="col">
+    Druhá strana téže mince: uživatelů s&nbsp;prvním vkladem ubylo z&nbsp;<b>991/měsíc (2024)
+    na 395/měsíc (2026)</b>, tedy −60,2&nbsp;%. Peníze z&nbsp;platformy od května 2026 čistě
+    odtékají. To není problém nabídky ani onboardingu — je to problém přítoku nových
+    platících uživatelů.
+  </p>
+</section>
+
+<!-- ============ 07 ============ -->
+<section id="s7">
+  <div class="sec-head"><span class="sec-n">07</span><h2>Kam cílit</h2></div>
+  <p class="lede">Dvě páky: koho přivádět (akvizice) a&nbsp;koho probudit (aktivace už získané
+  báze). Při dnešní ceně akvizice je druhá výrazně levnější.</p>
+
+  <h3 style="margin-bottom:10px">Akvizice: posun cílení na 45–64</h3>
+  <div class="tblwrap">
+    <table>
+      <caption>Modelový dopad přesunu akvizičního mixu</caption>
+      <thead><tr><th>Scénář</th><th>Kč na registraci</th><th>Změna</th></tr></thead>
+      <tbody>
+        <tr><td>Dnešní mix (3–9/2026)</td><td class="num">67 503</td><td class="num">—</td></tr>
+        <tr><td>Přesun 10 p. b. z 18–24 do 45–54</td><td class="num">77 394</td><td class="num pos">+14,7 %</td></tr>
+        <tr><td>Přesun 10 p. b. z 25–34 do 55–64</td><td class="num">76 568</td><td class="num pos">+13,4 %</td></tr>
+        <tr><td>Přesun 5 p. b. z 18–24 do 55–64</td><td class="num">73 077</td><td class="num pos">+8,3 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="col">
+    Model předpokládá, že přivedení lidé se budou chovat jako historická skupina stejného věku,
+    a&nbsp;<b>neříká nic o&nbsp;ceně za akvizici</b> — ta u&nbsp;starších skupin bývá vyšší. Pořadí je
+    ale robustní: i&nbsp;při dvojnásobné ceně je 45–64 výhodnější než 18–24. Skupinu 18–24 bych
+    nevypínal — vstup od 500&nbsp;Kč je pro ni přirozený a&nbsp;část z&nbsp;ní časem doroste. Jde
+    o&nbsp;přesun váhy, ne o&nbsp;vypnutí kanálu.
+  </p>
+
+  <h3 style="margin:34px 0 10px">Aktivace: pět segmentů, které už máme</h3>
+  <div class="tblwrap">
+    <table>
+      <caption>Segmenty k aktivaci — velikost a peníze</caption>
+      <thead><tr><th>Segment</th><th>Účtů</th><th>Portfolio (mil. Kč)</th><th>Hotovost (mil. Kč)</th><th>Medián věku</th></tr></thead>
+      <tbody>
+        <tr><td>A · Ověřen, nikdy neinvestoval</td><td class="num">18 987</td><td class="num">0,0</td><td class="num">7,55</td><td class="num">34</td></tr>
+        <tr><td>B · Vyžaduje re-verifikaci, má portfolio</td><td class="num">2 072</td><td class="num">70,2</td><td class="num">12,04</td><td class="num">32</td></tr>
+        <tr><td>C · Investor s hotovostí nad 100 tis.</td><td class="num">267</td><td class="num">342,8</td><td class="num">69,70</td><td class="num">46</td></tr>
+        <tr><td>D · premium 1 (blízko posunu na p2)</td><td class="num">10 441</td><td class="num">1 026,4</td><td class="num">46,45</td><td class="num">38</td></tr>
+        <tr><td>E · starter s portfoliem 1–5 tis.</td><td class="num">8 125</td><td class="num">18,2</td><td class="num">6,94</td><td class="num">33</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <figcaption>Kde leží objem podle roku registrace</figcaption>
+    <div class="chartbox"><svg class="chart" id="chL" role="img" aria-label="Podíl na celkovém portfoliu podle roku registrace uživatele"></svg><div class="tt" id="ttL"></div></div>
+    <p class="fignote">Podíl na 6,38&nbsp;mld.&nbsp;Kč aktuálních portfolií podle roku, kdy se uživatel registroval.</p>
+  </figure>
+
+  <p class="col">
+    <b>Kohorty 2021–2023 drží 60,2&nbsp;% objemu, kohorty 2025–2026 jen 15,4&nbsp;%.</b> Objem
+    stojí na staré bázi. Při ceně 4&nbsp;124&nbsp;Kč za nového investora je aktivace existujících
+    uživatelů dnes nejlevnější dostupný objem: nejlepší poměr má <b>segment C</b> — 267&nbsp;lidí
+    drží 69,7&nbsp;mil.&nbsp;Kč hotovosti, což je počet zvládnutelný telefonátem. <b>Segment B</b>
+    je 2&nbsp;072 aktivních investorů, kterým v&nbsp;další investici brání administrativa.
+    U&nbsp;<b>segmentu A</b> by 10&nbsp;% konverze při mediánové částce znamenalo
+    <b>65,4&nbsp;mil.&nbsp;Kč</b>.
+  </p>
+</section>
+
+<!-- ============ 08 ============ -->
+<section id="s8">
+  <div class="sec-head"><span class="sec-n">08</span><h2>Co udělat</h2></div>
+  <p class="lede">Seřazeno podle poměru dopadu a&nbsp;náročnosti.</p>
+
+  <div class="actions">
+    <div class="act">
+      <div class="pri">P1</div>
+      <div>
+        <h3>Spravit tagování B2B v marketingových datech</h3>
+        <p>Bez něj nejde říct, jestli se investice do získávání developerů vrací — a celá
+        analýza akvizice stojí na provozním odhadu (performance 75&nbsp;% B2B) místo na datech.
+        Podle toho odhadu je rozdíl zásadní: cena za registraci buď +97,6&nbsp;% (celý spend),
+        nebo +1,2&nbsp;% (jen B2C). Dnešní <code>DAILY_SPEND_B2B</code> vykazuje v&nbsp;3–6/2026
+        jen 1,5–6,2&nbsp;% a&nbsp;mezi 8/2024 a&nbsp;2/2025 sedm měsíců přesnou nulu.</p>
+        <div class="meta"><span>Dopad: <b>rozdíl mezi +1,2 % a +97,6 %</b></span><span>Vlastník: <b>Marketing / Data</b></span></div>
+      </div>
+    </div>
+    <div class="act">
+      <div class="pri">P2</div>
+      <div>
+        <h3>Rozhodnout, jak dlouho dát B2B rozpočtu čas</h3>
+        <p>Přesun je obhajitelný — nabídka klesla o&nbsp;24,1&nbsp;% a&nbsp;bez projektů nemá
+        smysl shánět investory. Stojí ale zhruba <b>3,4&nbsp;mil.&nbsp;Kč B2C rozpočtu za půl roku</b>
+        a&nbsp;přibližně <b>2&nbsp;100 registrací</b>. Nabídka se zatím nezvedla (7–8/2026: 189
+        a&nbsp;202&nbsp;mil.). Nastavit termín a&nbsp;metriku, na které se to vyhodnotí.</p>
+        <div class="meta"><span>Cena přesunu: <b>−44,2 % B2C rozpočtu</b></span><span>Vlastník: <b>Vedení / Marketing</b></span></div>
+      </div>
+    </div>
+    <div class="act">
+      <div class="pri">P3</div>
+      <div>
+        <h3>Zavolat 267 investorům, kteří sedí na hotovosti</h3>
+        <p>Zůstatek nad 100&nbsp;tis.&nbsp;Kč, medián věku 46, drží 20,3&nbsp;% svého portfolia v&nbsp;hotovosti.
+        Zjistit, jestli jim chybí vhodná nabídka, nebo čekají záměrně. Při dnešní ceně akvizice
+        je to nejlevnější objem, který můžeme získat.</p>
+        <div class="meta"><span>Objem v&nbsp;sázce: <b>69,7 mil. Kč</b></span><span>Lidí: <b>267</b></span><span>Vlastník: <b>Sales / Investor relations</b></span></div>
+      </div>
+    </div>
+    <div class="act">
+      <div class="pri">P4</div>
+      <div>
+        <h3>Odblokovat 2 072 investorů čekajících na re-verifikaci</h3>
+        <p>Mají portfolio 70,2&nbsp;mil.&nbsp;Kč a&nbsp;12,0&nbsp;mil.&nbsp;Kč hotovosti, ale nemohou dál investovat.
+        Zjistit průměrnou dobu vyřízení a&nbsp;jestli je zdržení na naší, nebo jejich straně.</p>
+        <div class="meta"><span>Objem v&nbsp;sázce: <b>82,2 mil. Kč</b></span><span>Lidí: <b>2 072</b></span><span>Vlastník: <b>Compliance / Ops</b></span></div>
+      </div>
+    </div>
+    <div class="act">
+      <div class="pri">P5</div>
+      <div>
+        <h3>Vyřadit 595 falešných účtů i ze Snowflake</h3>
+        <p>Registrace 30.&nbsp;1.&nbsp;2025 s&nbsp;datem narození 3.&nbsp;8.&nbsp;1940. Dnes nafukují leden 2025
+        o&nbsp;17&nbsp;% (4&nbsp;064 místo 3&nbsp;469 registrací) a&nbsp;budou zkreslovat každé meziroční srovnání
+        akvizice. Zároveň prověřit, jak se 595&nbsp;účtů dostalo přes registraci — a&nbsp;jestli by
+        rate-limit nebo validace ročníku podobný pokus nezachytily dřív.</p>
+        <div class="meta"><span>Dopad: <b>čistá historická data</b></span><span>Vlastník: <b>Data / Security</b></span></div>
+      </div>
+    </div>
+    <div class="act">
+      <div class="pri">P6</div>
+      <div>
+        <h3>Přestat měřit onboarding přes vyplněnost data narození</h3>
+        <p>Metrika od ledna 2026 měří jinou věc než předtím. Nahradit ji KYC&nbsp;rate na měsíční
+        kohortu a&nbsp;v&nbsp;dashboardech řadu k&nbsp;1.&nbsp;1.&nbsp;2026 vizuálně přerušit.</p>
+        <div class="meta"><span>Dopad: <b>zabrání chybnému rozhodnutí</b></span><span>Vlastník: <b>Data / Analytics</b></span></div>
+      </div>
+    </div>
+    <div class="act">
+      <div class="pri">P7</div>
+      <div>
+        <h3>Posunout akviziční mix směrem k 45–64</h3>
+        <p>Přesun 10&nbsp;p.&nbsp;b. rozpočtu z&nbsp;nejmladší skupiny znamená modelově +14,7&nbsp;% hodnoty
+        na registraci. Ověřit na reálné ceně za akvizici v&nbsp;kanálech — model cenu nezná.
+        Skupinu 18–24 nevypínat, jen jí snížit váhu.</p>
+        <div class="meta"><span>Modelový dopad: <b>+14,7 % Kč/registraci</b></span><span>Vlastník: <b>Marketing</b></span></div>
+      </div>
+    </div>
+    <div class="act">
+      <div class="pri">P8</div>
+      <div>
+        <h3>Dát compliance k prověření 169 účtů s věkem pod 18 při registraci</h3>
+        <p>164 z&nbsp;nich prošlo KYC. Dnes není nikdo z&nbsp;nich nezletilý a&nbsp;expozice je nulová,
+        pravděpodobně jde o&nbsp;překlepy. Jde ale o&nbsp;ověřené účty, kde evidovaný údaj odporuje
+        podmínce vstupu.</p>
+        <div class="meta"><span>Objem: <b>8,68 mil. Kč</b></span><span>Účtů: <b>169</b></span><span>Vlastník: <b>Compliance</b></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 09 ============ -->
+<section id="s9">
+  <div class="sec-head"><span class="sec-n">09</span><h2>Metodika a limity</h2></div>
+
+  <div class="find">
+    <div class="eyebrow">Prázdná peněženka není nula</div>
+    <p>
+      U&nbsp;<b>17&nbsp;730 účtů</b> peněženka vůbec nevznikla — v&nbsp;exportu je prázdná buňka, ne nula.
+      Tyto účty jsem z&nbsp;průměrů zůstatků vyloučil místo dosazení nuly, jinak by průměrný zůstatek
+      vyšel uměle nízký.
+    </p>
+  </div>
+
+  <div class="find">
+    <div class="eyebrow">Sloupec „Investováno"</div>
+    <p>
+      Je to <b>aktuální velikost portfolia</b>, ne kumulativní historie. Pro měření dnešního
+      stavu je to správná metrika: když se projekt splatil a&nbsp;uživatel peníze reinvestoval,
+      je to v&nbsp;čísle vidět. Neviditelní zůstávají jen ti, kdo po splacení <b>nereinvestovali</b> —
+      u&nbsp;nich nelze odlišit „nikdy neinvestoval" od „investoval a&nbsp;odešel". Zbývající výhrada
+      je proto hlavně <b>zralost kohorty</b>: kdo se registroval před šesti měsíci, nestihl
+      portfolio vybudovat. Z&nbsp;metrik typu „portfolio na investora" proto u&nbsp;čerstvých kohort
+      závěry nedělám.
+    </p>
+  </div>
+
+  <div class="find">
+    <div class="eyebrow">Past ve Snowflake, na kterou jsem narazil</div>
+    <p>
+      Pole <code>CHANNEL</code> v&nbsp;<code>CHANNEL_DAILY_METRICS</code> obsahuje vedle atomických
+      kanálů i&nbsp;<b>předagregované kombinace</b> („performance&nbsp;+&nbsp;direct&nbsp;+&nbsp;organic&nbsp;…").
+      Prostý součet přes všechny hodnoty <code>CHANNEL</code> nafoukne spend zhruba
+      <b>čtyřnásobně</b>. Všechny marketingové údaje zde jsou počítané s&nbsp;filtrem
+      <code>CHANNEL NOT LIKE '%+%'</code>. Registrace touto pastí netrpí (kombinace mají
+      <code>REGISTERED_USERS&nbsp;=&nbsp;0</code>), počty nových investorů ano.
+    </p>
+  </div>
+
+  <div class="find">
+    <div class="eyebrow">Přiřazení B2B je odhad, ne měření</div>
+    <p>
+      Rozdělení spendu na B2C a B2B od 3/2026 stojí na provozním zadání
+      (<b>performance 75&nbsp;% B2B / 25&nbsp;% B2C, referral a ostatní kanály 100&nbsp;% B2C</b>),
+      protože sloupec <code>DAILY_SPEND_B2B</code> ten přesun nezachycuje. Pro dřívější období
+      používám ten sloupec. Výsledek je proto <b>citlivý na ten předpoklad</b>: při 75&nbsp;% vychází
+      cena za registraci +1,2&nbsp;%, bez odečtení B2B +97,6&nbsp;%. Nezávislý na předpokladu je
+      pouze test na referralu (+29,8&nbsp;%) a chování kanálu performance (registrace −85,7&nbsp;%
+      při spendu +13,3&nbsp;%) — <b>na těch dvou závěr stojí</b>.
+    </p>
+  </div>
+
+  <div class="find">
+    <div class="eyebrow">Co v datech není</div>
+    <p>
+      Export uživatelů neobsahuje <b>datum první investice</b>, <b>počet projektů v&nbsp;portfoliu</b>
+      ani <b>historii změn KYC stavu</b>. Snowflake neobsahuje rozpad spendu po kampaních
+      a&nbsp;kreativách, takže <b>na otázku „proč zdražila akvizice" tato data neodpovídají</b> —
+      jen ji přesně vymezují. Zralost kohort nejde z&nbsp;jednoho snapshotu dorovnat; směr
+      zkreslení je ale známý (starší kohorta je vždy zralejší), a&nbsp;tak to i&nbsp;čtu.
+    </p>
+  </div>
+
+  <div class="find">
+    <div class="eyebrow">Kontrola</div>
+    <p>
+      Všechna čísla pocházejí z&nbsp;jednoho výpočetního skriptu a&nbsp;byla nezávisle přepočítána
+      druhým, který čte zdrojový soubor jinou cestou (streamované čtení místo dataframe).
+      Křížová kontrola se Snowflake sedí: rozdíl v&nbsp;registracích za leden 2025 je přesně
+      595&nbsp;falešných účtů. Analýza pracuje výhradně s&nbsp;agregáty; žádný individuální záznam
+      se do výstupu nedostal.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <p>
+    Investown Technologies s.&nbsp;r.&nbsp;o. · interní analytický materiál · řez dat 4.&nbsp;9.&nbsp;2026 ·
+    zdroje: export registrovaných uživatelů (FO&nbsp;i&nbsp;PO) z&nbsp;administrace a&nbsp;Snowflake
+    (<code>CHANNEL_DAILY_METRICS</code>, <code>DAILY_METRICS</code>).
+    Materiál není určen investorům ani k&nbsp;externímu použití. Části dotýkající se
+    regulatorních povinností (věk při registraci, KYC) vyžadují posouzení compliance.
+  </p>
+</footer>
+
+</main>
+
+<aside class="rail" aria-label="Obsah">
+  <ol>
+    <li><a href="#s1"><span class="rn">01</span>Falešné účty a data</a></li>
+    <li><a href="#s2"><span class="rn">02</span>Báze dnes</a></li>
+    <li><a href="#s3"><span class="rn">03</span>Věk registrujících</a></li>
+    <li><a href="#s4"><span class="rn">04</span>Vysvětluje věk pokles?</a></li>
+    <li><a href="#s5"><span class="rn">05</span>Co tedy klesá</a></li>
+    <li><a href="#s6"><span class="rn">06</span>Marketing</a></li>
+    <li><a href="#s7"><span class="rn">07</span>Kam cílit</a></li>
+    <li><a href="#s8"><span class="rn">08</span>Co udělat</a></li>
+    <li><a href="#s9"><span class="rn">09</span>Metodika a limity</a></li>
+  </ol>
+</aside>
+</div>
+</div>
+
+<script>
+const MES=[["2023-01",2459,84.22,55.02],["2023-02",2666,77.16,47.37],["2023-03",2404,92.39,69.01],["2023-04",1368,92.25,71.56],["2023-05",1072,92.54,68.66],["2023-06",1133,92.14,65.84],["2023-07",1439,88.33,61.08],["2023-08",2072,88.27,61.34],["2023-09",2042,85.21,53.87],["2023-10",2076,86.99,63.82],["2023-11",1698,89.4,66.31],["2023-12",2940,93.81,76.94],["2024-01",3620,89.45,65.75],["2024-02",2946,87.68,56.69],["2024-03",2412,84.04,52.03],["2024-04",2142,77.08,47.48],["2024-05",1806,75.97,45.46],["2024-06",2138,69.88,39.1],["2024-07",1234,76.74,50.57],["2024-08",1763,87.24,55.08],["2024-09",2453,76.93,44.52],["2024-10",3206,79.91,53.31],["2024-11",3377,77.88,49.36],["2024-12",2719,75.47,46.89],["2025-01",3469,73.57,43.01],["2025-02",1518,83.14,54.48],["2025-03",939,91.16,66.45],["2025-04",1203,92.52,76.64],["2025-05",630,89.68,66.67],["2025-06",623,90.85,63.56],["2025-07",820,88.78,62.93],["2025-08",904,89.38,60.84],["2025-09",788,89.59,61.04],["2025-10",1353,86.92,60.68],["2025-11",2511,76.66,43.85],["2025-12",2344,81.23,48.34],["2026-01",1827,61.63,40.94],["2026-02",1378,46.08,44.19],["2026-03",1275,53.25,49.25],["2026-04",1258,60.89,55.8],["2026-05",1295,46.56,42.39],["2026-06",942,52.12,47.56],["2026-07",770,43.9,37.92],["2026-08",800,36.38,33.25],["2026-09",122,50.0,43.44]];
+const KV=[["2022Q1",7224,37.21,32.45,17.84,8.5,2.7,1.3],["2022Q2",6053,26.48,37.62,21.03,10.99,2.99,0.89],["2022Q3",5662,35.36,37.35,17.01,7.29,2.12,0.87],["2022Q4",6196,34.73,38.46,16.77,7.1,2.15,0.79],["2023Q1",6216,28.46,34.2,18.29,11.1,4.55,3.39],["2023Q2",3248,28.36,35.25,20.54,11.15,3.33,1.39],["2023Q3",4706,28.35,34.62,19.51,11.77,3.87,1.89],["2023Q4",5957,24.49,31.19,19.91,15.68,5.72,3.0],["2024Q1",7660,26.03,30.65,19.93,14.74,5.85,2.79],["2024Q2",4356,23.12,27.43,20.94,16.21,7.55,4.75],["2024Q3",4267,21.49,29.97,21.61,16.01,6.47,4.45],["2024Q4",7088,23.52,24.8,20.1,17.28,8.48,5.81],["2025Q1",4568,19.9,25.57,23.56,17.89,8.34,4.75],["2025Q2",2224,23.11,27.97,21.4,17.76,6.74,3.01],["2025Q3",2217,24.13,27.47,21.43,17.14,6.63,3.2],["2025Q4",4916,23.31,23.49,21.3,18.23,9.44,4.23],["2026Q1",2410,18.51,22.28,21.78,22.66,10.17,4.61],["2026Q2",1851,24.1,23.5,21.93,17.07,9.18,4.21],["2026Q3",686,25.07,23.32,21.43,17.06,8.75,4.37]];
+const AGE=["18–24","25–34","35–44","45–54","55–64","65+"];
+const HODN=[["18–24",18123],["25–34",38966],["35–44",77040],["45–54",117036],["55–64",129620],["65+",101209]];
+const MKT=[["2024-01",3225909,3620,1923,891,1678],["2024-02",2221503,2946,1083,754,2051],["2024-03",1660234,2412,931,688,1783],["2024-04",1758325,2142,805,821,2184],["2024-05",1613150,1806,686,893,2352],["2024-06",1856548,2138,615,868,3019],["2024-07",652429,1234,528,529,1236],["2024-08",465873,1763,716,264,651],["2024-09",1568025,2453,744,639,2108],["2024-10",2299546,3206,1378,717,1669],["2024-11",2799756,3377,1247,829,2245],["2024-12",2183974,2719,1042,803,2096],["2025-01",2269518,4064,1242,558,1827],["2025-02",1181764,1518,625,779,1891],["2025-03",394894,939,566,421,698],["2025-04",1193082,1203,842,992,1417],["2025-05",510519,630,388,810,1316],["2025-06",532650,623,346,855,1539],["2025-07",526629,820,439,642,1200],["2025-08",590125,904,428,653,1379],["2025-09",513523,788,404,652,1271],["2025-10",1150552,1353,602,850,1911],["2025-11",2592668,2511,904,1033,2868],["2025-12",2949979,2344,924,1259,3193],["2026-01",1438100,1827,542,787,2653],["2026-02",1222287,1378,403,887,3033],["2026-03",1399643,1275,471,1098,2972],["2026-04",1789720,1258,532,1423,3364],["2026-05",1682963,1295,407,1300,4135],["2026-06",1504602,942,299,1597,5032],["2026-07",1348187,770,196,1751,6879],["2026-08",1001647,800,211,1252,4747]];
+const IDX=[["2024-01",173.6,145.7],["2024-02",119.5,118.6],["2024-03",89.3,97.1],["2024-04",94.6,86.2],["2024-05",86.8,72.7],["2024-06",99.9,86.0],["2024-07",35.1,49.7],["2024-08",25.1,71.0],["2024-09",84.4,98.7],["2024-10",123.7,129.0],["2024-11",150.6,135.9],["2024-12",117.5,109.4],["2025-01",122.1,163.6],["2025-02",63.6,61.1],["2025-03",21.2,37.8],["2025-04",64.2,48.4],["2025-05",27.5,25.4],["2025-06",28.7,25.1],["2025-07",28.3,33.0],["2025-08",31.7,36.4],["2025-09",27.6,31.7],["2025-10",61.9,54.5],["2025-11",139.5,101.1],["2025-12",158.7,94.3],["2026-01",77.4,73.5],["2026-02",65.8,55.5],["2026-03",75.3,51.3],["2026-04",96.3,50.6],["2026-05",90.5,52.1],["2026-06",80.9,37.9],["2026-07",72.5,31.0],["2026-08",53.9,32.2]];
+const NAB=[["2024-01",215],["2024-02",287],["2024-03",238],["2024-04",233],["2024-05",261],["2024-06",224],["2024-07",357],["2024-08",330],["2024-09",220],["2024-10",326],["2024-11",319],["2024-12",417],["2025-01",270],["2025-02",216],["2025-03",303],["2025-04",311],["2025-05",222],["2025-06",260],["2025-07",352],["2025-08",238],["2025-09",223],["2025-10",211],["2025-11",263],["2025-12",250],["2026-01",278],["2026-02",198],["2026-03",246],["2026-04",171],["2026-05",220],["2026-06",230],["2026-07",189],["2026-08",202]];
+const TOK=[["2024-01",153],["2024-02",124],["2024-03",162],["2024-04",153],["2024-05",151],["2024-06",131],["2024-07",186],["2024-08",189],["2024-09",143],["2024-10",206],["2024-11",165],["2024-12",288],["2025-01",197],["2025-02",132],["2025-03",134],["2025-04",108],["2025-05",99],["2025-06",105],["2025-07",68],["2025-08",15],["2025-09",53],["2025-10",103],["2025-11",62],["2025-12",72],["2026-01",92],["2026-02",66],["2026-03",10],["2026-04",41],["2026-05",-54],["2026-06",-111],["2026-07",-48],["2026-08",-4]];
+const FUN=[["Registrace",138838],["Vyplnil datum narození",114597],["Ověřen (Verified)",57225],["Ověřen a investuje",38238]];
+const LOR=[[0,0],[5,0.02],[10,0.06],[15,0.14],[20,0.28],[25,0.47],[30,0.75],[35,1.13],[40,1.65],[45,2.35],[50,3.28],[55,4.57],[60,6.25],[65,8.33],[70,11.01],[75,14.45],[80,19.1],[85,25.65],[90,34.83],[95,50.39],[100,100]];
+const URO=[["starter",79.15,0.68,109889],["active",7.88,4.07,10941],["premium 1",7.52,16.1,10441],["premium 2",3.21,20.45,4461],["premium 3",1.23,17.54,1707],["premium 4",1.01,41.16,1399]];
+const KOH=[["2021",1384.7,21.72,7118],["2022",978.8,15.35,6432],["2023",1477.2,23.17,8550],["2024",1554.4,24.38,9497],["2025",798.2,12.52,6304],["2026",182.7,2.87,2477]];
+const VEKP=[["18–24",11.61,3.27,4667],["25–34",30.91,17.2,12428],["35–44",26.07,26.99,10482],["45–54",19.66,31.59,7905],["55–64",8.38,13.7,3368],["65+",3.38,7.24,1359]];
+const ABS=[["2021",3496,9253,6596,3722,1192,332],["2022",8445,9119,4564,2132,629,246],["2023",5483,6758,3908,2540,914,524],["2024",5585,6580,4786,3743,1654,1023],["2025",3104,3554,3074,2488,1142,563],["2026",1064,1132,1078,979,475,219]];
+
+const SPLIT=[["2024-01",3172574,53335],["2024-02",2165861,55642],["2024-03",1600465,59769],["2024-04",1686744,71581],["2024-05",1555595,57555],["2024-06",1827007,29541],["2024-07",650420,2009],["2024-08",465873,0],["2024-09",1568025,0],["2024-10",2299546,0],["2024-11",2799756,0],["2024-12",2183974,0],["2025-01",2269518,0],["2025-02",1181764,0],["2025-03",394189,705],["2025-04",1153383,39699],["2025-05",418983,91536],["2025-06",405450,127200],["2025-07",470511,56118],["2025-08",519705,70420],["2025-09",425110,88413],["2025-10",1106326,44226],["2025-11",2575181,17487],["2025-12",2932669,17310],["2026-01",1377995,60105],["2026-02",1165210,57077],["2026-03",680722,718922],["2026-04",1069824,719896],["2026-05",854175,828788],["2026-06",706143,798459],["2026-07",567965,780222],["2026-08",467452,534195]];
+const PIDX=[["2024-01",154.5,86.5],["2024-02",166.2,77.1],["2024-03",122.8,78.6],["2024-04",104.7,74.5],["2024-05",104.6,78.2],["2024-06",120.2,132.9],["2024-07",26.7,48.9],["2024-08",10.0,32.6],["2024-09",83.7,119.1],["2024-10",80.2,126.5],["2024-11",134.0,182.4],["2024-12",92.3,162.7],["2025-01",115.7,245.6],["2025-02",82.8,67.1],["2025-03",9.4,30.2],["2025-04",10.4,18.6],["2025-05",15.3,14.9],["2025-06",25.1,24.2],["2025-07",18.9,34.5],["2025-08",20.8,44.6],["2025-09",17.0,31.0],["2025-10",40.0,47.7],["2025-11",121.8,150.9],["2025-12",115.0,117.3],["2026-01",103.1,79.6],["2026-02",87.4,19.9],["2026-03",90.9,16.5],["2026-04",91.0,6.6],["2026-05",104.8,15.1],["2026-06",101.0,9.3],["2026-07",98.6,9.3],["2026-08",67.5,7.0]];
+const REFC=[["2024-01",1038],["2024-02",611],["2024-03",535],["2024-04",796],["2024-05",866],["2024-06",1146],["2024-07",632],["2024-08",323],["2024-09",882],["2024-10",1031],["2024-11",1141],["2024-12",1103],["2025-01",984],["2025-02",350],["2025-03",328],["2025-04",1216],["2025-05",665],["2025-06",339],["2025-07",353],["2025-08",405],["2025-09",487],["2025-10",899],["2025-11",1413],["2025-12",1860],["2026-01",392],["2026-02",406],["2026-03",705],["2026-04",1262],["2026-05",1106],["2026-06",954],["2026-07",585],["2026-08",402]];
+const NS="http://www.w3.org/2000/svg";
+const tok=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt=n=>n.toLocaleString("cs-CZ");
+const fmt1=n=>n.toLocaleString("cs-CZ",{minimumFractionDigits:1,maximumFractionDigits:1});
+const MN=["led","úno","bře","dub","kvě","čvn","čvc","srp","zář","říj","lis","pro"];
+const ml=s=>{const p=s.split("-");return MN[+p[1]-1]+" "+p[0].slice(2)};
+
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function txt(p,x,y,s,o){
+  o=o||{};
+  const t=el("text",{x:x,y:y,"font-size":o.fs||11,"font-family":o.ff||'"IBM Plex Mono", monospace',
+    fill:o.fill||tok("--faint"),"text-anchor":o.anchor||"start","font-weight":o.fw||400},p);
+  t.textContent=s;return t}
+function tipOn(node,box,tip,html){
+  const show=ev=>{
+    tip.innerHTML=html;tip.style.opacity=1;
+    const r=box.getBoundingClientRect();
+    let x=ev.clientX-r.left+12,y=ev.clientY-r.top-10;
+    if(x+tip.offsetWidth>r.width-4)x=ev.clientX-r.left-tip.offsetWidth-12;
+    if(x<0)x=0;if(y<0)y=0;
+    tip.style.left=x+"px";tip.style.top=y+"px"};
+  node.addEventListener("mousemove",show);
+  node.addEventListener("mouseenter",show);
+  node.addEventListener("mouseleave",()=>{tip.style.opacity=0})}
+function setup(id,W,H){const s=document.getElementById(id);s.innerHTML="";s.setAttribute("viewBox","0 0 "+W+" "+H);return s}
+function ramp(){return[tok("--a1"),tok("--a2"),tok("--a3"),tok("--a4"),tok("--a5"),tok("--a6")]}
+function legend(id,items){
+  document.getElementById(id).innerHTML=items.map(it=>{
+    const isLine=it[2]==="line";
+    return '<span><i style="width:'+(isLine?14:10)+'px;height:'+(isLine?2:10)+'px;display:inline-block;background:'+it[0]+'"></i>'+it[1]+'</span>'}).join("")}
+
+/* ---- generický měsíční sloupcový graf ---- */
+function bars(id,ttid,data,vi,max,ticks,unit,opt){
+  opt=opt||{};
+  const W=880,H=opt.H||250,ML=opt.ML||50,MR=14,MT=16,MB=40;
+  const svg=setup(id,W,H),iw=W-ML-MR,ih=H-MT-MB;
+  const lo=opt.min!==undefined?opt.min:0;
+  const y=v=>MT+ih-((v-lo)/(max-lo))*ih,bw=iw/data.length;
+  ticks.forEach(g=>{
+    el("line",{x1:ML,x2:W-MR,y1:y(g),y2:y(g),stroke:tok("--rule"),"stroke-width":1},svg);
+    txt(svg,ML-9,y(g)+4,fmt(g)+(unit?" "+unit:""),{anchor:"end"})});
+  const box=svg.parentNode,tip=document.getElementById(ttid);
+  data.forEach((d,i)=>{
+    const v=d[vi],partial=opt.partial&&opt.partial(d);
+    const yy=v>=0?y(v):y(0),hh=Math.max(1,Math.abs(y(v)-y(0)));
+    const r=el("rect",{x:ML+i*bw+1.2,y:yy,width:Math.max(1,bw-2.4),height:hh,
+      fill:partial?tok("--rule-strong"):(v<0?tok("--warm"):tok("--accent")),rx:2},svg);
+    if(partial)r.setAttribute("opacity",".75");
+    tipOn(r,box,tip,"<b>"+ml(d[0])+"</b><div class='r'><span>"+(opt.label||"hodnota")+"</span><b>"+fmt(v)+(unit?" "+unit:"")+"</b></div>"
+      +(opt.extra?opt.extra(d):"")+(partial?"<div class='r'><span>neúplný měsíc</span></div>":""))});
+  data.forEach((d,i)=>{
+    if(d[0].slice(-3)!=="-01")return;
+    txt(svg,ML+i*bw+bw/2,H-MB+18,d[0].slice(0,4),{anchor:"middle"});
+    el("line",{x1:ML+i*bw,x2:ML+i*bw,y1:MT,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1,"stroke-dasharray":"2 3"},svg)});
+  el("line",{x1:ML,x2:W-MR,y1:y(0),y2:y(0),stroke:tok("--rule-strong"),"stroke-width":1},svg);
+  if(opt.annot)opt.annot(svg,ML,MT,bw,ih,y)}
+
+/* ---- generický měsíční čárový graf (2 řady) ---- */
+function lines(id,ttid,data,idxs,cols,max,ticks,unit,labels,opt){
+  opt=opt||{};
+  const W=880,H=opt.H||270,ML=opt.ML||54,MR=16,MT=opt.MT||24,MB=40;
+  const svg=setup(id,W,H),iw=W-ML-MR,ih=H-MT-MB;
+  const y=v=>MT+ih-(v/max)*ih,xx=i=>ML+(i/(data.length-1))*iw;
+  ticks.forEach(g=>{
+    el("line",{x1:ML,x2:W-MR,y1:y(g),y2:y(g),stroke:tok("--rule"),"stroke-width":1},svg);
+    txt(svg,ML-9,y(g)+4,fmt(g)+(unit?" "+unit:""),{anchor:"end"})});
+  if(opt.mark){
+    const mi=data.findIndex(d=>d[0]===opt.mark[0]);
+    el("line",{x1:xx(mi),x2:xx(mi),y1:MT-6,y2:MT+ih,stroke:tok("--warm"),"stroke-width":1.5,"stroke-dasharray":"4 3"},svg);
+    txt(svg,xx(mi)+(opt.mark[2]?7:-7),MT-11,opt.mark[1],{anchor:opt.mark[2]?"start":"end",fill:tok("--warm"),fw:500})}
+  idxs.forEach((ix,k)=>{
+    let p="";data.forEach((r,i)=>{p+=(i?"L":"M")+xx(i).toFixed(1)+" "+y(r[ix]).toFixed(1)+" "});
+    el("path",{d:p,fill:"none",stroke:cols[k],"stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"},svg)});
+  const box=svg.parentNode,tip=document.getElementById(ttid);
+  data.forEach((r,i)=>{
+    const hit=el("rect",{x:xx(i)-iw/(data.length-1)/2,y:MT,width:iw/(data.length-1),height:ih,fill:"transparent"},svg);
+    tipOn(hit,box,tip,"<b>"+ml(r[0])+"</b>"+idxs.map((ix,k)=>
+      "<div class='r'><span style='color:"+cols[k]+"'>"+labels[k]+"</span><b>"+fmt(r[ix])+(unit?" "+unit:"")+"</b></div>").join(""))});
+  data.forEach((d,i)=>{if(d[0].slice(-3)==="-01")txt(svg,xx(i),H-MB+18,d[0].slice(0,4),{anchor:"middle"})});
+  el("line",{x1:ML,x2:W-MR,y1:MT+ih,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1},svg)}
+
+/* ---- vodorovné sloupce s popiskem ---- */
+function hbars(id,ttid,rows,max,cols,unit,fmtv,tipfn,opt){
+  opt=opt||{};
+  const W=opt.W||560,H=opt.H||250,ML=opt.ML||58,MR=opt.MR||104,MT=10,MB=opt.MB||30;
+  const svg=setup(id,W,H),iw=W-ML-MR,ih=H-MT-MB;
+  const x=v=>v/max*iw;
+  (opt.ticks||[0,max/2,max]).forEach(g=>{
+    el("line",{x1:ML+x(g),x2:ML+x(g),y1:MT,y2:MT+ih,stroke:tok("--rule"),"stroke-width":1},svg);
+    txt(svg,ML+x(g),H-MB+18,(opt.tickfmt?opt.tickfmt(g):fmt(g))+(unit?" "+unit:""),{anchor:"middle"})});
+  const bh=ih/rows.length,box=svg.parentNode,tip=document.getElementById(ttid);
+  rows.forEach((d,i)=>{
+    const yy=MT+i*bh+bh*.19,hh=bh*.62;
+    const r=el("rect",{x:ML,y:yy,width:Math.max(2,x(d[1])),height:hh,fill:cols[i],rx:3},svg);
+    tipOn(r,box,tip,tipfn(d));
+    txt(svg,ML-11,yy+hh/2+4,d[0],{anchor:"end",fs:12,fill:tok("--slate"),fw:500,ff:'"IBM Plex Sans", sans-serif'});
+    txt(svg,ML+x(d[1])+9,yy+hh/2+4,fmtv(d),{fs:12,fill:tok("--ink"),fw:500})});
+  el("line",{x1:ML,x2:ML,y1:MT,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1},svg)}
+
+/* ---- párové vodorovné sloupce ---- */
+function paired(id,ttid,lgid,rows,l1,l2,unit){
+  const W=520,H=290,ML=76,MR=58,MT=10,MB=32;
+  const svg=setup(id,W,H),iw=W-ML-MR,ih=H-MT-MB;
+  const max=Math.max.apply(null,rows.map(r=>Math.max(r[1],r[2])));
+  const x=v=>v/max*iw,c1=tok("--accent"),c2=tok("--warm");
+  [0,25,50,75].filter(g=>g<=max).forEach(g=>{
+    el("line",{x1:ML+x(g),x2:ML+x(g),y1:MT,y2:MT+ih,stroke:tok("--rule"),"stroke-width":1},svg);
+    txt(svg,ML+x(g),H-MB+18,g+" "+unit,{anchor:"middle"})});
+  const gh=ih/rows.length,box=svg.parentNode,tip=document.getElementById(ttid);
+  rows.forEach((r,i)=>{
+    const yy=MT+i*gh,bh=gh*.30;
+    [[r[1],c1,0],[r[2],c2,1]].forEach(pair=>{
+      const rc=el("rect",{x:ML,y:yy+gh*.16+pair[2]*(bh+2),width:Math.max(1.5,x(pair[0])),height:bh,fill:pair[1],rx:2},svg);
+      tipOn(rc,box,tip,"<b>"+r[0]+"</b><div class='r'><span>"+l1+"</span><b>"+fmt1(r[1])+" "+unit+"</b></div><div class='r'><span>"+l2+"</span><b>"+fmt1(r[2])+" "+unit+"</b></div>"
+        +(r[3]!==undefined?"<div class='r'><span>počet</span><b>"+fmt(r[3])+"</b></div>":""))});
+    txt(svg,ML-11,yy+gh/2+4,r[0],{anchor:"end",fs:12,fill:tok("--slate"),fw:500,ff:'"IBM Plex Sans", sans-serif'});
+    txt(svg,ML+Math.max(x(r[1]),x(r[2]))+8,yy+gh/2+4,fmt1(Math.max(r[1],r[2]))+" "+unit,{fs:10,fill:tok("--faint")})});
+  el("line",{x1:ML,x2:ML,y1:MT,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1},svg);
+  legend(lgid,[[c1,l1],[c2,l2]])}
+
+/* ---- skladane mesicni sloupce (2 slozky) ---- */
+function stacked(id,ttid,lgid,data,max,ticks,cols,labels,unit,opt){
+  opt=opt||{};
+  const W=880,H=opt.H||250,ML=opt.ML||66,MR=14,MT=16,MB=40;
+  const svg=setup(id,W,H),iw=W-ML-MR,ih=H-MT-MB;
+  const y=v=>MT+ih-(v/max)*ih,bw=iw/data.length;
+  ticks.forEach(g=>{
+    el("line",{x1:ML,x2:W-MR,y1:y(g),y2:y(g),stroke:tok("--rule"),"stroke-width":1},svg);
+    txt(svg,ML-9,y(g)+4,fmt(g)+(unit?" "+unit:""),{anchor:"end"})});
+  const box=svg.parentNode,tip=document.getElementById(ttid);
+  data.forEach((d,i)=>{
+    let acc=0;
+    const tot=d[1]+d[2];
+    const html="<b>"+ml(d[0])+"</b>"
+      +"<div class='r'><span style='color:"+cols[0]+"'>"+labels[0]+"</span><b>"+fmt(d[1])+"</b></div>"
+      +"<div class='r'><span style='color:"+cols[1]+"'>"+labels[1]+"</span><b>"+fmt(d[2])+"</b></div>"
+      +"<div class='r'><span>celkem</span><b>"+fmt(tot)+"</b></div>"
+      +(tot?"<div class='r'><span>podíl B2B</span><b>"+fmt1(d[2]/tot*100)+" %</b></div>":"");
+    [1,2].forEach(k=>{
+      const v=d[k],hh=(v/max)*ih;
+      if(hh<=0)return;
+      const r=el("rect",{x:ML+i*bw+1.2,y:MT+ih-acc-hh+1,width:Math.max(1,bw-2.4),
+        height:Math.max(.5,hh-2),fill:cols[k-1]},svg);
+      tipOn(r,box,tip,html);
+      acc+=hh})});
+  data.forEach((d,i)=>{
+    if(d[0].slice(-3)!=="-01")return;
+    txt(svg,ML+i*bw+bw/2,H-MB+18,d[0].slice(0,4),{anchor:"middle"});
+    el("line",{x1:ML+i*bw,x2:ML+i*bw,y1:MT,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1,"stroke-dasharray":"2 3"},svg)});
+  el("line",{x1:ML,x2:W-MR,y1:MT+ih,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1},svg);
+  if(opt.annot)opt.annot(svg,ML,MT,bw);
+  legend(lgid,[[cols[0],labels[0]],[cols[1],labels[1]]])}
+
+function drawAll(){
+  const cols=ramp();
+
+  /* A: registrace */
+  bars("chA","ttA",MES,1,4000,[0,1000,2000,3000,4000],"",{
+    label:"registrací",partial:d=>d[0]==="2026-09",
+    annot:(svg,ML,MT,bw)=>{
+      const i=MES.findIndex(d=>d[0]==="2025-03");
+      txt(svg,ML+i*bw+3,MT+10,"škrcení marketingu",{fill:tok("--slate"),fw:500});
+      const j=MES.findIndex(d=>d[0]==="2025-11");
+      txt(svg,ML+j*bw+3,MT+26,"návrat spendu",{fill:tok("--slate"),fw:500})}});
+
+  /* B: věková skladba 100% stacked */
+  (function(){
+    const W=880,H=320,ML=38,MR=14,MT=14,MB=46;
+    const svg=setup("chB",W,H),iw=W-ML-MR,ih=H-MT-MB,bw=iw/KV.length;
+    [0,25,50,75,100].forEach(g=>{
+      const yy=MT+ih-(g/100)*ih;
+      el("line",{x1:ML,x2:W-MR,y1:yy,y2:yy,stroke:tok("--rule"),"stroke-width":1},svg);
+      txt(svg,ML-9,yy+4,g+" %",{anchor:"end"})});
+    const box=svg.parentNode,tip=document.getElementById("ttB");
+    KV.forEach((row,i)=>{
+      let acc=0;
+      const rows=AGE.map((a,k)=>"<div class='r'><span>"+a+"</span><b>"+fmt1(row[k+2])+" %</b></div>").join("");
+      for(let k=0;k<6;k++){
+        const hh=(row[k+2]/100)*ih;
+        const r=el("rect",{x:ML+i*bw+1.5,y:MT+ih-acc-hh+1,width:Math.max(1,bw-3),height:Math.max(.5,hh-2),fill:cols[k]},svg);
+        tipOn(r,box,tip,"<b>"+row[0].replace("Q"," · Q")+"</b> &nbsp;n = "+fmt(row[1])+rows);
+        acc+=hh}});
+    KV.forEach((row,i)=>{if(row[0].slice(-2)==="Q1")txt(svg,ML+i*bw+bw/2,H-MB+18,row[0].slice(0,4),{anchor:"middle"})});
+    el("line",{x1:ML,x2:W-MR,y1:MT+ih,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1},svg);
+    legend("lgB",cols.map((c,k)=>[c,AGE[k]]))})();
+
+  /* N: absolutní počty (grouped) */
+  (function(){
+    const W=880,H=280,ML=48,MR=14,MT=16,MB=42;
+    const svg=setup("chN",W,H),iw=W-ML-MR,ih=H-MT-MB;
+    const max=10000,y=v=>MT+ih-(v/max)*ih;
+    [0,2500,5000,7500,10000].forEach(g=>{
+      el("line",{x1:ML,x2:W-MR,y1:y(g),y2:y(g),stroke:tok("--rule"),"stroke-width":1},svg);
+      txt(svg,ML-9,y(g)+4,fmt(g),{anchor:"end"})});
+    const gw=iw/ABS.length,bw=(gw-14)/6;
+    const box=svg.parentNode,tip=document.getElementById("ttN");
+    ABS.forEach((row,i)=>{
+      for(let k=0;k<6;k++){
+        const v=row[k+1],x=ML+i*gw+7+k*bw;
+        const r=el("rect",{x:x+.5,y:y(v),width:Math.max(1,bw-1),height:Math.max(1,MT+ih-y(v)),fill:cols[k],rx:1.5},svg);
+        tipOn(r,box,tip,"<b>"+row[0]+"</b> · "+AGE[k]+"<div class='r'><span>registrací</span><b>"+fmt(v)+"</b></div>")}
+      txt(svg,ML+i*gw+gw/2,H-MB+18,row[0],{anchor:"middle"})});
+    el("line",{x1:ML,x2:W-MR,y1:MT+ih,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1},svg);
+    legend("lgN",cols.map((c,k)=>[c,AGE[k]]))})();
+
+  /* C: hodnota registrace dle věku */
+  hbars("chC","ttC",HODN,140000,cols,"",
+    d=>fmt(d[1])+" Kč",
+    d=>"<b>"+d[0]+" let</b><div class='r'><span>na 1 registraci</span><b>"+fmt(d[1])+" Kč</b></div><div class='r'><span>index k 18–24</span><b>"+(d[1]/18123).toFixed(2)+"×</b></div>",
+    {ticks:[0,70000,140000],tickfmt:g=>fmt(g/1000)+" tis."});
+
+  /* D: datum narození vs KYC */
+  lines("chD","ttD",MES,[2,3],[tok("--accent"),tok("--warm")],100,[0,25,50,75,100],"%",
+    ["vyplnil datum nar.","prošel KYC"],{H:300,MT:26,mark:["2026-01","leden 2026 · pole se přesunulo v toku"]});
+  legend("lgD",[[tok("--accent"),"vyplnil datum narození","line"],[tok("--warm"),"prošel KYC (Verified nebo ReVerification)","line"]]);
+
+  /* E: spend */
+  bars("chE","ttE",MKT,1,3200000,[0,800000,1600000,2400000,3200000],"",{
+    label:"spend Kč",H:250,ML:66,
+    extra:d=>"<div class='r'><span>registrací</span><b>"+fmt(d[2])+"</b></div><div class='r'><span>Kč / registraci</span><b>"+fmt(d[4])+"</b></div>",
+    annot:(svg,ML,MT,bw)=>{
+      const i=MKT.findIndex(d=>d[0]==="2025-03");
+      txt(svg,ML+i*bw+3,MT+12,"dno 3/2025",{fill:tok("--slate"),fw:500});
+      const j=MKT.findIndex(d=>d[0]==="2025-11");
+      txt(svg,ML+j*bw+3,MT+12,"návrat 11/2025",{fill:tok("--slate"),fw:500})}});
+
+  /* F: CAC */
+  lines("chF","ttF",MKT,[4,5],[tok("--accent"),tok("--warm")],7000,[0,1750,3500,5250,7000],"Kč",
+    ["Kč / registraci","Kč / nového investora"],{H:280,ML:64});
+  legend("lgF",[[tok("--accent"),"Kč za registraci","line"],[tok("--warm"),"Kč za nového investora","line"]]);
+
+  /* G: index */
+  lines("chG","ttG",IDX,[1,2],[tok("--accent"),tok("--warm")],180,[0,45,90,135,180],"",
+    ["spend (index)","registrace (index)"],{H:270,ML:46,mark:["2026-01","od 2026 se řady rozevírají",1]});
+  legend("lgG",[[tok("--accent"),"marketingový spend (index, 2024 = 100)","line"],[tok("--warm"),"registrace (index, 2024 = 100)","line"]]);
+
+  /* K: nabídka */
+  bars("chK","ttK",NAB,1,450,[0,150,300,450],"",{label:"nová kola (mil. Kč)",H:220,ML:48});
+
+  /* M: čistý tok */
+  bars("chM","ttM",TOK,1,300,[-150,0,150,300],"",{label:"čistý tok (mil. Kč)",H:230,ML:54,min:-150});
+
+  /* H: funnel */
+  (function(){
+    const W=880,H=210,ML=200,MR=126,MT=12,MB=14;
+    const svg=setup("chH",W,H),iw=W-ML-MR,ih=H-MT-MB;
+    const max=FUN[0][1],bh=ih/FUN.length,fc=[cols[1],cols[2],cols[3],cols[5]];
+    const box=svg.parentNode,tip=document.getElementById("ttH");
+    FUN.forEach((d,i)=>{
+      const yy=MT+i*bh+bh*.17,hh=bh*.6,w=Math.max(2,d[1]/max*iw);
+      const r=el("rect",{x:ML,y:yy,width:w,height:hh,fill:fc[i],rx:3},svg);
+      const prev=i?FUN[i-1][1]:0;
+      tipOn(r,box,tip,"<b>"+d[0]+"</b><div class='r'><span>účtů</span><b>"+fmt(d[1])+"</b></div>"
+        +"<div class='r'><span>z báze</span><b>"+fmt1(d[1]/max*100)+" %</b></div>"
+        +(prev?"<div class='r'><span>z předchozího</span><b>"+fmt1(d[1]/prev*100)+" %</b></div>":""));
+      txt(svg,ML-12,yy+hh/2+4,d[0],{anchor:"end",fs:12,fill:tok("--slate"),fw:500,ff:'"IBM Plex Sans", sans-serif'});
+      txt(svg,ML+w+9,yy+hh/2,fmt(d[1]),{fs:12,fill:tok("--ink"),fw:500});
+      if(i)txt(svg,ML+w+9,yy+hh/2+14,"↓ "+fmt1(d[1]/prev*100)+" %",{fs:10,fill:tok("--faint")})})})();
+
+  /* I: Lorenz */
+  (function(){
+    const W=520,H=300,ML=48,MR=16,MT=14,MB=44;
+    const svg=setup("chI",W,H),iw=W-ML-MR,ih=H-MT-MB;
+    const x=v=>ML+v/100*iw,y=v=>MT+ih-v/100*ih;
+    [0,25,50,75,100].forEach(g=>{
+      el("line",{x1:ML,x2:W-MR,y1:y(g),y2:y(g),stroke:tok("--rule"),"stroke-width":1},svg);
+      txt(svg,ML-9,y(g)+4,g+" %",{anchor:"end"});
+      txt(svg,x(g),H-MB+18,g+" %",{anchor:"middle"})});
+    el("line",{x1:x(0),y1:y(0),x2:x(100),y2:y(100),stroke:tok("--rule-strong"),"stroke-width":1.5,"stroke-dasharray":"4 3"},svg);
+    let p="";LOR.forEach((d,i)=>{p+=(i?"L":"M")+x(d[0]).toFixed(1)+" "+y(d[1]).toFixed(1)+" "});
+    el("path",{d:p,fill:"none",stroke:tok("--accent"),"stroke-width":2,"stroke-linejoin":"round"},svg);
+    const box=svg.parentNode,tip=document.getElementById("ttI");
+    LOR.forEach(d=>{
+      const c=el("circle",{cx:x(d[0]),cy:y(d[1]),r:8,fill:"transparent"},svg);
+      tipOn(c,box,tip,"<div class='r'><span>nejmenších "+d[0]+" % investorů</span><b>"+fmt1(d[1])+" % objemu</b></div>"
+        +"<div class='r'><span>největších "+(100-d[0])+" %</span><b>"+fmt1(100-d[1])+" % objemu</b></div>")});
+    txt(svg,x(52),y(72),"dokonalá rovnost",{anchor:"middle",fill:tok("--faint"),fs:10});
+    txt(svg,ML+4,MT+10,"podíl objemu",{fs:10});
+    txt(svg,W-MR,H-MB+34,"podíl investorů (od nejmenších)",{anchor:"end",fs:10});
+    el("line",{x1:ML,x2:W-MR,y1:MT+ih,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1},svg);
+    el("line",{x1:ML,x2:ML,y1:MT,y2:MT+ih,stroke:tok("--rule-strong"),"stroke-width":1},svg)})();
+
+  /* L: kohorty */
+  hbars("chL","ttL",KOH.map(r=>[r[0],r[1],r[2],r[3]]),1600,cols,"",
+    d=>fmt1(d[1])+" mil. · "+fmt1(d[2])+" %",
+    d=>"<b>kohorta "+d[0]+"</b><div class='r'><span>portfolio</span><b>"+fmt1(d[1])+" mil. Kč</b></div>"
+      +"<div class='r'><span>podíl objemu</span><b>"+fmt1(d[2])+" %</b></div>"
+      +"<div class='r'><span>investorů</span><b>"+fmt(d[3])+"</b></div>",
+    {W:640,H:250,ML:56,MR:170,ticks:[0,800,1600],tickfmt:g=>fmt(g)+" mil."});
+
+  /* J, P: párové */
+  paired("chJ","ttJ","lgJ",URO,"podíl účtů","podíl objemu","%");
+  paired("chP","ttP","lgP",VEKP,"podíl investorů","podíl objemu","%");
+
+  /* Q: rozdělení spendu B2C / B2B */
+  stacked("chQ","ttQ","lgQ",SPLIT,3400000,[0,850000,1700000,2550000,3400000],
+    [tok("--accent"),tok("--warm")],["B2C (investoři)","B2B (developeři)"],"",{
+      annot:(svg,ML,MT,bw)=>{
+        const i=SPLIT.findIndex(d=>d[0]==="2026-03");
+        el("line",{x1:ML+i*bw,x2:ML+i*bw,y1:MT-6,y2:MT+194,stroke:tok("--warm"),
+          "stroke-width":1.5,"stroke-dasharray":"4 3"},svg);
+        txt(svg,ML+i*bw-7,MT-4,"od 3/2026 provozní odhad",{anchor:"end",fill:tok("--warm"),fw:500})}});
+
+  /* S: cena registrace z referralu */
+  lines("chS","ttS",REFC,[1],[tok("--accent")],2000,[0,500,1000,1500,2000],"Kč",
+    ["Kč za registraci"],{H:240,ML:60,MT:16});
+
+  /* R: performance kanál indexovaně */
+  lines("chR","ttR",PIDX,[1,2],[tok("--accent"),tok("--warm")],250,[0,62,125,187,250],"",
+    ["spend (index)","registrace (index)"],{H:260,ML:46,mark:["2026-02","registrace se odtrhly od spendu",1]});
+  legend("lgR",[[tok("--accent"),"spend performance (index, 2024 = 100)","line"],
+    [tok("--warm"),"registrace z performance (index, 2024 = 100)","line"]])}
+
+drawAll();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawAll);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",drawAll);
+new MutationObserver(drawAll).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+const links=[].slice.call(document.querySelectorAll(".rail a"));
+const secs=links.map(a=>document.querySelector(a.getAttribute("href")));
+const io=new IntersectionObserver(es=>{es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const i=secs.indexOf(e.target);
+  links.forEach((a,k)=>a.classList.toggle("on",k===i))})},{rootMargin:"-15% 0px -70% 0px"});
+secs.forEach(s=>{if(s)io.observe(s)});
+</script>
